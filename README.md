@@ -8,9 +8,10 @@ Auto Table Filter (atf for short, not to be confused with Alcohol, Tobacco, and 
 3. [A Better Example](#abetterexample)
 4. [Required Parameters](#requiredparameters)
 5. [Optional Parameters](#optionalparameters)
-6. [Going Further](#goingfurther)
-7. [Copyright](#copyright)
-8. [Licensing](#licensing)
+6. [Methods](#methods)
+7. [Going Further](#goingfurther)
+8. [Copyright](#copyright)
+9. [Licensing](#licensing)
 
 <a id="howtouse"></a>
 ## How To Use Auto Table Filter 
@@ -161,6 +162,7 @@ styles: atf_styles.ONYX
 ```
 **Styles with gradients were gathered from excellent sites such as [uiGradients](https://uigradients.com) and [ColorZilla](http://www.colorzilla.com/gradient-editor).**
 
+<a id="methods"></a>
 ## Methods
 #### addPagingOpt(value)
 You can call this function to add a new integer value to your paging views for pagination.  You can dynamically update the filter to have additional pages as your content expands via requests or other updates to the page. 
