@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Auto Table Filter Styles</title>
+    <link href="../src/auto-table-filter.css" rel="stylesheet" />
+    <script src="../src/auto-table-filter.js"></script>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #ccc;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+      }
+
+      footer {
+        margin-top: 5%;
+        margin-bottom: 2%;
+        text-align: center;
+      }
+
+      #stylesTable {
+        margin: 1% auto;
+      }
+
+      #stylesTable thead tr th {
+        font-weight: bold;
+        font-size: 1.5em;
+        color: white;
+        text-shadow: 1px 1px 2px #000;
+      }
+
+      .atf-label {
+        text-align: right;
+        padding-right: 20px;
+        font-weight: bold;
+      }
+
+      .atf-style {
+        text-indent: 1em;
+        font-size: 1.5em;
+        width: 80%;
+        height: 100px;
+        border: 1px solid rgba(0,0,0,0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stylesContainer"></div>
+    <table id="stylesTable">
+      <thead>
+        <tr>
+          <th>Style Name</th><th>Sample Background and Text</th>
+        </tr>
+      </thead>
+      <tbody> 
+      </tbody>
+    </table>
+    <footer>
+      <p>Auto table filter is covered under the GNU GPLv3 license <a href="../gpl.txt">located here</a> and 
+        <a href="https://www.gnu.org/licenses/gpl.txt">and here</a>.  Copyright <span id="cyear"></span> <a href="//marcusparsons.com">Marcus Parsons</a></p>
+    </footer>
+    <script>
+      var _ = document.querySelector.bind(document);
+
+      var tr, td1, td2;
+
+      for (var key in atf_styles) {
+        tr = document.createElement('tr');
+        td1 = document.createElement('td');
+        td1.innerHTML = "atf_styles." + key;
+        td1.classList.add('atf-label');
+        tr.insertAdjacentElement('afterbegin', td1);
+        td2 = document.createElement('td');
+        td2.classList.add('atf-style');
+        for (var prop in atf_styles[key]) {
+          td2.style[prop] = atf_styles[key][prop];
+        }
+        td2.innerHTML = "Sample text";
+        tr.insertAdjacentElement('beforeend', td2);
+        _('#stylesTable tbody').insertAdjacentElement('beforeend', tr);
+      }
+
+      atf_styles.DEEPSEASPACE.textShadow = '1px 1px 4px #000';
+
+      atf({
+        table: 'stylesTable',
+        container: 'stylesContainer',
+        submitBy: 'typing',
+        styles: atf_styles.DEEPSEASPACE,
+        pagination: true,
+        pagingViews: [5, 10, 15, 'ALL']
+      });
+
+      //Copyright info
+      _('#cyear').innerHTML= "2017-" + (new Date()).getFullYear();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Auto Table Filter Example</title>
+    <link href="../src/auto-table-filter.css" rel="stylesheet" />
+    <script src="../src/auto-table-filter.min.js"></script>
+    <link href="styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="myContainer"></div>
+    <table id="myTable">
+      <thead>
+        <tr><th>Product</th><th>Price Per KG</th></tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <footer>
+      <p>Auto table filter is covered under the GNU GPLv3 license <a href="../gpl.txt">located here</a> and 
+        <a href="https://www.gnu.org/licenses/gpl.txt">and here</a>.  Copyright <span id="cyear"></span> <a href="//marcusparsons.com">Marcus Parsons</a></p>
+    </footer>
+    
+    <script>
+      //this is just the setup for the page
+      //I added the following only to aid in my example
+      //this has nothing to do with auto-table-filter itself
+      var tbody = document.querySelector('#myTable tbody');
+      var veggies = ["Artichoke", "Arugula", "Asparagus", "Beet", "Belgian Endive", "Bell Pepper", "Bitter Melon/Bitter Gourd", "Bok Choy/Bok Choi/Pak Choy", "Broccoli", "Brussels Sprouts", "Burdock Root/Gobo", "Cabbage", "Calabash", "Capers", "Carrot", "Cassava/Yuca", "Cauliflower", "Celery", "Celery Root/Celeriac", "Celtuce", "Chayote", "Chinese Broccoli/Kai-lan", "Corn/Maize", "Daikon Radish", "Edamame", "Eggplant/Aubergine", "Elephant Garlic", "Endive", "Kohlrabi", "Leeks", "Lemongrass", "Lettuce", "Napa Cabbage", "Nopales", "Okra", "Olive", "Onion", "Plantain", "Potato", "Pumpkin", "Purslane", "Radicchio", "Radish", "Rutabaga", "Sweet Potato", "Swiss Chard", "Taro", "Tomatillo", "Tomato", "Turnip", "Water Chestnut", "Water Spinach", "Watercress", "Winter Melon", "Yams", "Zucchini"]
+      for (var i = 0; i < veggies.length; i++) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        var td2 = document.createElement('td');
+        td1.innerHTML = veggies[i];
+        td2.innerHTML = "$" + (Math.random()).toFixed(2);
+        tr.insertAdjacentElement('beforeend', td1);
+        tr.insertAdjacentElement('beforeend', td2);
+        tbody.insertAdjacentElement('beforeend', tr);
+      }
+
+      
+      //adding a bit of text shadow to the BLUESKIES style
+      //any styles can be extended like this
+      atf_styles.BLUESKIES.textShadow = '1px 1px 4px #000';
+
+      /* 
+        Now, I'm going to call auto-table-filter.
+        The only required properties for this are:
+        the id for the table to add filtering to (table),
+        the id for the container to store the filtering functionality, usually an empty div (container),
+        and how you want to be able to submit input (submitBy) (either "typing" or "button")
+      */
+      
+
+      var newFilter = new atf({
+        //Required parameters
+        //table - the id of the table to target for filtering records
+        table: 'myTable',
+        //container - the id of the container to hook filtering functionality to
+        container: 'myContainer',
+        //submitBy - the method by which you want to submit search functionality (typing or button)
+        submitBy: 'typing',
+        //****************************
+        //Optional parameters
+        //styles - specifies an object of styles to apply to the container itself
+        styles: atf_styles.BLUESKIES,
+        //pagination - set to true if you wish to have pages set up for data
+        pagination: true,
+        //if pagination is set to true, then you must specify
+        //pagingViews - set an array with numbers corresponding to how many records to show per selection
+          //you can also use the 'ALL' key to to have a display all selection (not required to have 'ALL' though)
+        pagingViews: [5, 10, 25, 'ALL'],
+        //you can also specify the default view to use:
+        //defaultView - sets the default view to use (must exist in the pagingViews array or else it is ignored)
+		    defaultView: 10
+      });
+
+      newFilter.update('searchText', 'Search for a veggie');
+      //the following line is ignored:
+      newFilter.removePagingOpt('applebutter');
+      //the following line will remove the 25 option and can be number or string
+      newFilter.removePagingOpt('25');
+      
+      //And some copyright set up
+      document.querySelector('#cyear').innerHTML = "2017-" + (new Date()).getFullYear();
+    </script>
+  </body>
+</html>
