@@ -86,6 +86,14 @@ The `columnSelect` parameter is optional and only accepts a `boolean` for its in
 columnSelect: false
 ```
 
+#### defaultView (integer/string)
+The `defaultView ` parameter is optional and will accept `integer` or `string` values, although `string` values must contain only integers or the keyword `ALL`.  This parameter controls the default view to use for pagination.  If this parameter is omitted, `pagination` will select the first value of the `pagingViews` array as the default.  Also, the value specified in the `defaultView` **must exist** in the `pagingViews` array; otherwise, this parameter is ignored.
+```javascript
+defaultView: 50
+//Or: The only string accepted that is not all integers:
+//defaultView: "ALL"
+```
+
 #### display (string) 
 The `display` parameter is optional and only accepts a `string` for its input. This parameter controls the display of the **container**. Use the same values you would use for the CSS property `display` here i.e. `block`, `inline-block`, etc.  **By default,** display is set to `block`.
 ```javascript
@@ -116,6 +124,14 @@ The `labelText` parameter is optional and only accepts a `string` for its input.
 labelText: "Type here to search:"
 ```
 
+#### onComplete (function)
+The `onComplete` parameter is optional and must be a function to execute.  The function passed in to `onComplete` will execute once `atf` has finished loading.  On tables with 1K+ rows, it may take a second or two to add paging, so the `onComplete` function can be used to hide a loading screen, for example.  If you wish to access parameters passed in to `onComplete`, you should use the `arguments` keyword.
+```javascript
+onComplete: function () {
+    myPageLoader.style.display = "none";
+}
+```
+
 #### pagination (boolean)
 The `pagination ` parameter is optional and only accepts a `boolean` for its input.   This parameter allows you to set pages of records for your table.  **If you set this to true, you must specify a `pagingViews` parameter. By default,** this parameter is set to `false`.  If `defaultView` is omitted, pagination defaults to the first specified value.
 ```javascript
@@ -128,14 +144,6 @@ The `pagingViews` parameter is **required if pagination is set to true** and onl
 You can use integer, or string, values for the number of records to show and/or the `ALL` keyword (to show all records).  **If you use string values, ensure that there are only integers in the string unless using the `ALL` keyword.**  For an example of how this is used, check out the `example` provided in this repo.
 ```javascript
 pagingViews: [5, 10, 25, 50, 100, "ALL"]
-```
-
-#### defaultView (integer/string)
-The `defaultView ` parameter is optional and will accept `integer` or `string` values, although `string` values must contain only integers or the keyword `ALL`.  This parameter controls the default view to use for pagination.  If this parameter is omitted, `pagination` will select the first value of the `pagingViews` array as the default.  Also, the value specified in the `defaultView` **must exist** in the `pagingViews` array; otherwise, this parameter is ignored.
-```javascript
-defaultView: 50
-//Or: The only string accepted that is not all integers:
-//defaultView: "ALL"
 ```
 
 #### searchText (string)
