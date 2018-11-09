@@ -78,6 +78,9 @@ atf_styles.VENICE = {
 function atf() {
     var s = this;
     s.o = {};
+    var _ = document.querySelector.bind(document);
+    var __ = document.querySelectorAll.bind(document);
+
 
     //update a property
     this.update = function (prop, obj) {
@@ -85,14 +88,15 @@ function atf() {
             if (typeof obj === "object") {
                 switch (prop) {
                     case "styles":
-                        var keys = Object.keys(obj), key;
-                        for (i = 0; i < keys.length; i++) {    
+                        var keys = Object.keys(obj),
+                            key;
+                        for (i = 0; i < keys.length; i++) {
                             key = keys[i];
                             if (_('#' + s.o.container).style.hasOwnProperty(key)) {
-                                    _('#' + s.o.container).style[key] = obj[key];
+                                _('#' + s.o.container).style[key] = obj[key];
                             }
                         }
-                    break;
+                        break;
                 }
             }
             else {
@@ -100,17 +104,28 @@ function atf() {
                 switch (prop) {
                     case "searchText":
                         _('#' + s.o.container + '-atf-filtervalue').setAttribute("placeholder", s.o[prop]);
-                    break;
+                        break;
                 }
             }
         }
     };
 
+    //Remove a column from the filter selection
+    this.removeColumn = function (columnName) {
+        if (columnName) {
+            var el = _('#' + s.o.container + '-atf-filterselect option[value="' + columnName + '"]');
+            if (el) {
+                var parentNode = _('#' + s.o.container + '-atf-filterselect');
+                parentNode.removeChild(el);
+            }
+        }
+    }
+
     //Add a number to the pagination select
     this.addPagingOpt = function (val) {
         if (typeof val !== "undefined") {
             if (typeof val === "string" || typeof val === "number") {
-                val = (typeof val === "string") ? parseInt(val, 10) : val;
+                val = (typeof val === "string") ? +val : val;
                 if (!isNaN(val)) {
                     var sel = _('#' + s.o.container + '-atf-paging-select');
                     var opts = sel.querySelectorAll('option');
@@ -119,15 +134,17 @@ function atf() {
                     var ia = false;
                     for (var i = 0; i < opts.length; i++) {
                         if (dregx.test(opts[i].innerHTML.trim()) === true) {
-                            a.push(parseInt(opts[i].innerHTML, 10));
+                            a.push(+opts[i].innerHTML);
                         }
                         if (opts[i].innerHTML.toUpperCase() === 'ALL') {
                             ia = true;
                         }
                     }
                     a.push(val);
-                    a.sort(function (a,b) {
-                        return a > b;
+                    a.sort(function (a, b) {
+                        if (a > b) return 1;
+                        if (a < b) return -1;
+                        return 0;
                     });
                     if (ia) {
                         a.push("ALL");
@@ -147,6 +164,7 @@ function atf() {
         }
     };
 
+    //Remove a paging option
     this.removePagingOpt = function (val) {
         if (typeof val !== "undefined") {
             if (typeof val === "string" || typeof val === "number") {
@@ -164,6 +182,7 @@ function atf() {
         }
     };
 
+    //Filter values
     function filter() {
         var filtertype, filterval, filters = [];
         filtertype = _('#' + s.o.container + '-atf-filterselect').value;
@@ -208,28 +227,26 @@ function atf() {
             }
         }
     }
-
-    var _ = document.querySelector.bind(document);
-    var __ = document.querySelectorAll.bind(document);
-
+    
+    //Setup the new filter on this table
     if (typeof arguments[0] === "object" && Object.keys(arguments[0]).length) {
         var options = arguments[0];
         var availoptions = ['table', 'container', 'submitBy', 'display', 'includeLabel', 'labelText', 'isToggleableTable', 'searchText',
-            'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'pagination', 'pagingViews', 'defaultView'];
+            'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'pagination', 'pagingViews', 'defaultView', 'onComplete'];
         var givenoptions = Object.keys(options);
 
         if (givenoptions.indexOf('table') < 0) {
-            console.log('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
+            console.error('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
             return false;
         }
         if (givenoptions.indexOf('container') < 0) {
-            console.log('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
+            console.error('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
             return false;
         }
         for (var i = 0; i < availoptions.length; i++) {
             var optval = options[availoptions[i]];
             var prop = availoptions[i];
-            var coll = ["boolean", "string", "number"];
+            var coll = ["boolean", "string", "number", "function"];
             if (typeof optval !== "undefined") {
                 if (coll.indexOf(typeof optval) > -1) {
                     s.o[prop] = optval;
@@ -251,13 +268,16 @@ function atf() {
             }
         }
 
+        //if there was no table specified
         if (!s.o.table) {
-            console.log('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
+            console.error('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
             return false;
         }
 
+        //Take over the tbody element of this table
         _('#' + s.o.table + ' > tbody').setAttribute("id", s.o.container + "-atf-tbody");
 
+        //if there was a container specified
         if (s.o.container) {
             _('#' + s.o.container).classList.add('atf-filter-container');
             if (typeof s.o.styles !== "undefined") {
@@ -270,7 +290,7 @@ function atf() {
                     }
                 }
             }
-            _('#' + s.o.container).innerHTML = ((typeof s.o.includeLabel === "undefined" || s.o.includeLabel === true) ? "<label for='atf-filtervalue'>" + ((typeof s.o.labelText !== "undefined" && typeof s.o.labelText === "string") ? s.o.labelText : "Search:" ) + "</label> &nbsp;" : "") + "<input type='text' class='atf-filtervalue' id='" + s.o.container + "-atf-filtervalue' placeholder='" + ((typeof s.o.searchText === "undefined" || s.o.searchText === "") ? "Enter a value to search for": s.o.searchText) + "'>";
+            _('#' + s.o.container).innerHTML = ((typeof s.o.includeLabel === "undefined" || s.o.includeLabel === true) ? "<label for='atf-filtervalue'>" + ((typeof s.o.labelText !== "undefined" && typeof s.o.labelText === "string") ? s.o.labelText : "Search:") + "</label> &nbsp;" : "") + "<input type='text' class='atf-filtervalue' id='" + s.o.container + "-atf-filtervalue' placeholder='" + ((typeof s.o.searchText === "undefined" || s.o.searchText === "") ? "Enter a value to search for" : s.o.searchText) + "'>";
             if (typeof s.o.columnSelect === "undefined" || s.o.columnSelect === true) {
                 _('#' + s.o.container).innerHTML += "&nbsp; by column &nbsp; <select class='atf-filterselect' id='" + s.o.container + "-atf-filterselect'></select> &nbsp;";
             }
@@ -310,9 +330,9 @@ function atf() {
                     else {
                         var curopttxt = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
                         if (curopttxt !== 'ALL') {
-                            var curval = parseInt(curopttxt, 10);
+                            var curval = +curopttxt;
                             var curselopt = __('.atf-page-number-selected');
-                            var pageval = parseInt(curselopt[0].innerHTML, 10);
+                            var pageval = +curselopt[0].innerHTML;
                             var baseval = (pageval - 1) * curval;
                             if (typeof s.o.isToggleableTable !== "undefined") {
                                 if (s.o.isToggleableTable === true) {
@@ -359,6 +379,7 @@ function atf() {
             }, false);
         }
 
+        //Setup pagination if defined and true
         if (typeof s.o.pagination !== "undefined") {
             if (s.o.pagination === true) {
                 var pagingEl = document.createElement("div");
@@ -392,7 +413,7 @@ function atf() {
                         //set the select to be the s.o.defaultView, if defined and 
                         if (typeof s.o.defaultView !== 'undefined') {
                             if (typeof s.o.defaultView === 'string' && s.o.defaultView !== 'ALL') {
-                                s.o.defaultView = parseInt(s.o.defaultView, 10);
+                                s.o.defaultView = +s.o.defaultView;
                             }
                             var __opt;
                             if (s.o.defaultView === 'ALL') {
@@ -413,7 +434,7 @@ function atf() {
 
                         }
                         var curval = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
-                        var recordsPerPage = parseInt(curval, 10);
+                        var recordsPerPage = +curval;
                         var trs = __('#' + s.o.container + '-atf-tbody > tr');
                         trloop2:
                         for (var _tr = 0; _tr < trs.length; _tr++) {
@@ -475,7 +496,7 @@ function atf() {
                                     pageButtons[_x].classList.remove('atf-page-number-selected');
                                 }
                                 this.classList.add('atf-page-number-selected');
-                                var num = parseInt(this.innerHTML, 10);
+                                var num = +this.innerHTML;
                                 var beginning = (num - 1) * recordsPerPage;
                                 var ending = (num * recordsPerPage - 1);
                                 trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
@@ -578,16 +599,20 @@ function atf() {
                 }
             }
             else {
-                console.log("Error: pagination is set to true, but no pagingViews array was given.  Please give an array of values that correspond to the number of items to show when selected.");
+                console.error("Error: pagination is set to true, but no pagingViews array was given.  Please give an array of values that correspond to the number of items to show when selected.");
                 return false;
             }
         }
     }
     else if (typeof arguments[0] !== "object" || typeof arguments[0] === "undefined") {
-        console.log('Error: make sure to pass in a set of {} surrounding your properties like so:\natf({\n  table: "myTable",\n  container: "myContainer",\n  submitBy: "typing"\n});');
+        console.error('Error: make sure to pass in a set of {} surrounding your properties like so:\natf({\n  table: "myTable",\n  container: "myContainer",\n  submitBy: "typing"\n});');
     }
     else if (Object.keys(arguments[0]).length < 1) {
-        console.log('Error: no properties listed in the options object given to auto-table-filter.  Please at least specify the table, a container, and submitBy for filtering elements to perform filtering with. Remember to set these to the id values for the elements the same as the HTML id attribute i.e. a table with the id of "myFilteredTable" needs to have "myFilteredTable" passed to auto-table-filter as the table id and same with any other element based options.');
+        console.error('Error: no properties listed in the options object given to auto-table-filter.  Please at least specify the table, a container, and submitBy for filtering elements to perform filtering with. Remember to set these to the id values for the elements the same as the HTML id attribute i.e. a table with the id of "myFilteredTable" needs to have "myFilteredTable" passed to auto-table-filter as the table id and same with any other element based options.');
         return false;
+    }
+
+    if (typeof s.o.onComplete === "function") {
+        s.o.onComplete();
     }
 }
