@@ -388,7 +388,7 @@ function atf() {
                 _('#' + s.o.container).insertAdjacentElement('afterend', pagingEl);
                 if (typeof s.o.pagingViews !== "undefined") {
                     if (s.o.pagingViews.length < 1) {
-                        console.log("Error: pagination is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
+                        console.error("Error: pagination is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
                         return false;
                     }
                     else {
