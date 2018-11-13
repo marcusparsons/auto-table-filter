@@ -125,7 +125,7 @@ function atf() {
     this.addPagingOpt = function (val) {
         if (typeof val !== "undefined") {
             if (typeof val === "string" || typeof val === "number") {
-                val = (typeof val === "string") ? +val : val;
+                val = (typeof val === "string") ? parseInt(val, 10) : val;
                 if (!isNaN(val)) {
                     var sel = _('#' + s.o.container + '-atf-paging-select');
                     var opts = sel.querySelectorAll('option');
@@ -164,7 +164,6 @@ function atf() {
         }
     };
 
-    //Remove a paging option
     this.removePagingOpt = function (val) {
         if (typeof val !== "undefined") {
             if (typeof val === "string" || typeof val === "number") {
@@ -182,7 +181,6 @@ function atf() {
         }
     };
 
-    //Filter values
     function filter() {
         var filtertype, filterval, filters = [];
         filtertype = _('#' + s.o.container + '-atf-filterselect').value;
@@ -227,20 +225,20 @@ function atf() {
             }
         }
     }
-    
-    //Setup the new filter on this table
+
+
     if (typeof arguments[0] === "object" && Object.keys(arguments[0]).length) {
         var options = arguments[0];
         var availoptions = ['table', 'container', 'submitBy', 'display', 'includeLabel', 'labelText', 'isToggleableTable', 'searchText',
-            'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'pagination', 'pagingViews', 'defaultView', 'onComplete'];
+            'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'pagination', 'pagingViews', 'defaultView', 'onComplete', 'removePrevious'];
         var givenoptions = Object.keys(options);
 
         if (givenoptions.indexOf('table') < 0) {
-            console.error('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
+            console.log('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
             return false;
         }
         if (givenoptions.indexOf('container') < 0) {
-            console.error('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
+            console.log('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
             return false;
         }
         for (var i = 0; i < availoptions.length; i++) {
@@ -268,79 +266,109 @@ function atf() {
             }
         }
 
-        //if there was no table specified
         if (!s.o.table) {
-            console.error('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
+            console.log('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
             return false;
-        }
+        }       
 
-        //Take over the tbody element of this table
         _('#' + s.o.table + ' > tbody').setAttribute("id", s.o.container + "-atf-tbody");
 
-        //if there was a container specified
+        if (typeof s.o.removePrevious === "boolean") {
+            (function (s) {
+                if (s.o.container) {
+                    _('#' + s.o.container).innerHTML = '';
+                    if (__('#' + s.o.container + '-atf-paging-container').length > 0) {
+                        var pr = _('#' + s.o.container + '-atf-paging-container').parentNode;
+                        pr.removeChild(_('#' + s.o.container + '-atf-paging-container'));
+                    }
+                }
+            })(s);
+        }
+
+        //Setting up the container with filtering tools
         if (s.o.container) {
-            _('#' + s.o.container).classList.add('atf-filter-container');
-            if (typeof s.o.styles !== "undefined") {
-                if (typeof s.o.styles === "object") {
-                    var keys = Object.keys(s.o.styles);
-                    for (i = 0; i < keys.length; i++) {
-                        if (_('#' + s.o.container).style.hasOwnProperty([keys[i]])) {
-                            _('#' + s.o.container).style[keys[i]] = s.o.styles[keys[i]];
+            (function (s) {
+                _('#' + s.o.container).classList.add('atf-filter-container');
+                if (typeof s.o.styles !== "undefined") {
+                    if (typeof s.o.styles === "object") {
+                        var keys = Object.keys(s.o.styles);
+                        for (i = 0; i < keys.length; i++) {
+                            if (_('#' + s.o.container).style.hasOwnProperty([keys[i]])) {
+                                _('#' + s.o.container).style[keys[i]] = s.o.styles[keys[i]];
+                            }
                         }
                     }
                 }
-            }
-            _('#' + s.o.container).innerHTML = ((typeof s.o.includeLabel === "undefined" || s.o.includeLabel === true) ? "<label for='atf-filtervalue'>" + ((typeof s.o.labelText !== "undefined" && typeof s.o.labelText === "string") ? s.o.labelText : "Search:") + "</label> &nbsp;" : "") + "<input type='text' class='atf-filtervalue' id='" + s.o.container + "-atf-filtervalue' placeholder='" + ((typeof s.o.searchText === "undefined" || s.o.searchText === "") ? "Enter a value to search for" : s.o.searchText) + "'>";
-            if (typeof s.o.columnSelect === "undefined" || s.o.columnSelect === true) {
-                _('#' + s.o.container).innerHTML += "&nbsp; by column &nbsp; <select class='atf-filterselect' id='" + s.o.container + "-atf-filterselect'></select> &nbsp;";
-            }
-            else {
-                _('#' + s.o.container).innerHTML += "<select id='" + s.o.container + "-atf-filterselect' class='hider'></select> &nbsp;";
-            }
-
-            if (s.o.submitBy === 'button') {
-                _('#' + s.o.container).innerHTML += "<button class='atf-filtersubmit' id='" + s.o.container + "-atf-filtersubmit'>Submit</button>";
-            }
-            var ths = __('#' + s.o.table + ' > thead > tr > th');
-            var seloptions = "<option value='All' selected='selected'>All</option>";
-            for (i = 0; i < ths.length; i++) {
-                var thval = ths[i].innerHTML.trim();
-                if (thval !== '') {
-                    seloptions += "<option value='" + thval + "'>" + thval + "</option>";
+                _('#' + s.o.container).innerHTML = ((typeof s.o.includeLabel === "undefined" || s.o.includeLabel === true) ? "<label for='atf-filtervalue'>" + ((typeof s.o.labelText !== "undefined" && typeof s.o.labelText === "string") ? s.o.labelText : "Search:") + "</label> &nbsp;" : "") + "<input type='text' class='atf-filtervalue' id='" + s.o.container + "-atf-filtervalue' placeholder='" + ((typeof s.o.searchText === "undefined" || s.o.searchText === "") ? "Enter a value to search for" : s.o.searchText) + "'>";
+                if (typeof s.o.columnSelect === "undefined" || s.o.columnSelect === true) {
+                    _('#' + s.o.container).innerHTML += "&nbsp; by column &nbsp; <select class='atf-filterselect' id='" + s.o.container + "-atf-filterselect'></select> &nbsp;";
                 }
-            }
-            _('#' + s.o.container + '-atf-filterselect').innerHTML = seloptions;
-            _('#' + s.o.container).style.display = (typeof s.o.display !== "undefined" && s.o.display !== "") ? s.o.display : 'block';
-
-            if (s.o.submitBy === 'button') {
-                _('#' + s.o.container + '-atf-filtersubmit').addEventListener('click', function () { filter('container'); }, false);
-            }
-
-            _('#' + s.o.container + '-atf-filtervalue').addEventListener('keyup', function (e) {
-                if (e.which === 13 && (s.o.submitBy === 'button' || !s.o.submitBy)) {
-                    filter('container');
+                else {
+                    _('#' + s.o.container).innerHTML += "<select id='" + s.o.container + "-atf-filterselect' class='hider'></select> &nbsp;";
                 }
-                if (e.which === 8 && _('#' + s.o.container + '-atf-filtervalue').value === '') {
-                    var trs = __('#' + s.o.container + '-atf-tbody > tr');
-                    if (typeof s.o.pagination === "undefined") {
-                        for (i = 0; i < trs.length; i++) {
-                            trs[i].classList.remove('hider');
-                        }
+
+                if (s.o.submitBy === 'button') {
+                    _('#' + s.o.container).innerHTML += "<button class='atf-filtersubmit' id='" + s.o.container + "-atf-filtersubmit'>Submit</button>";
+                }
+                var ths = __('#' + s.o.table + ' > thead > tr > th');
+                var seloptions = "<option value='All' selected='selected'>All</option>";
+                for (i = 0; i < ths.length; i++) {
+                    var thval = ths[i].innerHTML.trim();
+                    if (thval !== '') {
+                        seloptions += "<option value='" + thval + "'>" + thval + "</option>";
                     }
-                    else {
-                        var curopttxt = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
-                        if (curopttxt !== 'ALL') {
-                            var curval = +curopttxt;
-                            var curselopt = __('.atf-page-number-selected');
-                            var pageval = +curselopt[0].innerHTML;
-                            var baseval = (pageval - 1) * curval;
-                            if (typeof s.o.isToggleableTable !== "undefined") {
-                                if (s.o.isToggleableTable === true) {
-                                    for (i = 0; i < curval * 2; i++) {
-                                        trs[i].classList.remove('hider');
+                }
+                _('#' + s.o.container + '-atf-filterselect').innerHTML = seloptions;
+                _('#' + s.o.container).style.display = (typeof s.o.display !== "undefined" && s.o.display !== "") ? s.o.display : 'block';
+
+                if (s.o.submitBy === 'button') {
+                    _('#' + s.o.container + '-atf-filtersubmit').addEventListener('click', function () { filter('container'); }, false);
+                }
+
+                _('#' + s.o.container + '-atf-filtervalue').addEventListener('keyup', function (e) {
+                    if (e.which === 13 && (s.o.submitBy === 'button' || !s.o.submitBy)) {
+                        filter('container');
+                    }
+                    if (e.which === 8 && _('#' + s.o.container + '-atf-filtervalue').value === '') {
+                        var trs = __('#' + s.o.container + '-atf-tbody > tr');
+                        if (typeof s.o.pagination === "undefined") {
+                            for (i = 0; i < trs.length; i++) {
+                                trs[i].classList.remove('hider');
+                            }
+                        }
+                        else {
+                            var curopttxt = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
+                            if (curopttxt !== 'ALL') {
+                                var curval = +curopttxt;
+                                var curselopt = __('.atf-page-number-selected');
+                                var pageval = +curselopt[0].innerHTML;
+                                var baseval = (pageval - 1) * curval;
+                                if (typeof s.o.isToggleableTable !== "undefined") {
+                                    if (s.o.isToggleableTable === true) {
+                                        for (i = 0; i < curval * 2; i++) {
+                                            if (typeof trs[i] !== "undefined") {
+                                                trs[i].classList.remove('hider');
+                                            }
+                                        }
+                                        for (i = trs.length - 1; i >= curval * 2; i--) {
+                                            if (typeof trs[i] !== "undefined") {
+                                                trs[i].classList.add('hider');
+                                            }
+                                        }
                                     }
-                                    for (i = trs.length - 1; i >= curval * 2; i--) {
-                                        trs[i].classList.add('hider');
+                                    else {
+                                        for (i = trs.length - 1; i >= 0; i--) {
+                                            if (typeof trs[i] !== "undefined") {
+                                                trs[i].classList.add('hider');
+                                            }
+                                        }
+                                        for (i = baseval; i < baseval + curval; i++) {
+                                            if (i !== trs.length) {
+                                                if (typeof trs[i] !== "undefined") {
+                                                    trs[i].classList.remove('hider');
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                                 else {
@@ -356,171 +384,79 @@ function atf() {
                             }
                             else {
                                 for (i = trs.length - 1; i >= 0; i--) {
-                                    trs[i].classList.add('hider');
-                                }
-                                for (i = baseval; i < baseval + curval; i++) {
-                                    if (i !== trs.length) {
-                                        trs[i].classList.remove('hider');
-                                    }
+                                    trs[i].classList.remove('hider');
                                 }
                             }
                         }
-                        else {
-                            for (i = trs.length - 1; i >= 0; i--) {
-                                trs[i].classList.remove('hider');
-                            }
-                        }
-                    }
 
-                }
-                if (s.o.submitBy === 'typing' && _('#' + s.o.container + '-atf-filtervalue').value !== '') {
-                    filter('container');
-                }
-            }, false);
+                    }
+                    if (s.o.submitBy === 'typing' && _('#' + s.o.container + '-atf-filtervalue').value !== '') {
+                        filter('container');
+                    }
+                }, false);
+            })(s);
         }
 
-        //Setup pagination if defined and true
+        //Pagination
         if (typeof s.o.pagination !== "undefined") {
             if (s.o.pagination === true) {
-                var pagingEl = document.createElement("div");
-                pagingEl.id = s.o.container + '-atf-paging-container';
-                pagingEl.setAttribute('class', 'atf-paging-container');
-                _('#' + s.o.container).insertAdjacentElement('afterend', pagingEl);
-                if (typeof s.o.pagingViews !== "undefined") {
-                    if (s.o.pagingViews.length < 1) {
-                        console.error("Error: pagination is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
-                        return false;
-                    }
-                    else {
-                        //add in the paging label
-                        var pagingLabel = document.createElement('label');
-                        pagingLabel.innerHTML = 'Show Records: &nbsp;&nbsp;&nbsp;';
-                        pagingLabel.id = s.o.container + '-atf-paging-label';
-                        pagingLabel.setAttribute('for', 'atf-paging-select');
-                        _('#' + s.o.container + '-atf-paging-container').insertAdjacentElement('beforeend', pagingLabel);
-                        //add in the paging select
-                        var pagingSelect = document.createElement('select');
-                        pagingSelect.id = s.o.container + '-atf-paging-select';
-                        pagingSelect.setAttribute('class', 'atf-paging-select');
-                        _('#' + s.o.container + '-atf-paging-label').insertAdjacentElement('afterend', pagingSelect);
-                        //insert the options into the paging select from the list of views
-                        for (var _po = 0; _po < s.o.pagingViews.length; _po++) {
-                            var pagingOption = document.createElement('option');
-                            pagingOption.innerHTML = s.o.pagingViews[_po];
-                            pagingOption.value = s.o.pagingViews[_po];
-                            _('#' + s.o.container + '-atf-paging-select').insertAdjacentElement('beforeend', pagingOption);
+                (function (s) {
+                    var pagingEl = document.createElement("div");
+                    pagingEl.id = s.o.container + '-atf-paging-container';
+                    pagingEl.setAttribute('class', 'atf-paging-container');
+                    _('#' + s.o.container).insertAdjacentElement('afterend', pagingEl);
+                    if (typeof s.o.pagingViews !== "undefined") {
+                        if (s.o.pagingViews.length < 1) {
+                            console.log("Error: pagination is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
+                            return false;
                         }
-                        //set the select to be the s.o.defaultView, if defined and 
-                        if (typeof s.o.defaultView !== 'undefined') {
-                            if (typeof s.o.defaultView === 'string' && s.o.defaultView !== 'ALL') {
-                                s.o.defaultView = +s.o.defaultView;
+                        else {
+                            //add in the paging label
+                            var pagingLabel = document.createElement('label');
+                            pagingLabel.innerHTML = 'Show Records: &nbsp;&nbsp;&nbsp;';
+                            pagingLabel.id = s.o.container + '-atf-paging-label';
+                            pagingLabel.setAttribute('for', 'atf-paging-select');
+                            _('#' + s.o.container + '-atf-paging-container').insertAdjacentElement('beforeend', pagingLabel);
+                            //add in the paging select
+                            var pagingSelect = document.createElement('select');
+                            pagingSelect.id = s.o.container + '-atf-paging-select';
+                            pagingSelect.setAttribute('class', 'atf-paging-select');
+                            _('#' + s.o.container + '-atf-paging-label').insertAdjacentElement('afterend', pagingSelect);
+                            //insert the options into the paging select from the list of views
+                            for (var _po = 0; _po < s.o.pagingViews.length; _po++) {
+                                var pagingOption = document.createElement('option');
+                                pagingOption.innerHTML = s.o.pagingViews[_po];
+                                pagingOption.value = s.o.pagingViews[_po];
+                                _('#' + s.o.container + '-atf-paging-select').insertAdjacentElement('beforeend', pagingOption);
                             }
-                            var __opt;
-                            if (s.o.defaultView === 'ALL') {
-                                __opt = _('#' + s.o.container + '-atf-paging-select option[value="ALL"]');
-                                if (__opt) {
-                                    __opt.setAttribute('selected', 'selected');
+                            //set the select to be the s.o.defaultView, if defined and 
+                            if (typeof s.o.defaultView !== 'undefined') {
+                                if (typeof s.o.defaultView === 'string' && s.o.defaultView !== 'ALL') {
+                                    s.o.defaultView = +s.o.defaultView;
                                 }
-                            }
-                            else {
-                                if (s.o.pagingViews.indexOf(s.o.defaultView) < 0) {
-                                    s.o.defaultView = s.o.pagingViews[0];
-                                }
-                                __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + s.o.defaultView + '"]');
-                                if (__opt) {
-                                    __opt.setAttribute('selected', 'selected');
-                                }
-                            }
-
-                        }
-                        var curval = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
-                        var recordsPerPage = +curval;
-                        var trs = __('#' + s.o.container + '-atf-tbody > tr');
-                        trloop2:
-                        for (var _tr = 0; _tr < trs.length; _tr++) {
-                            if (typeof s.o.ignoreRows !== "undefined" && typeof s.o.ignoreRows === "object") {
-                                var trclasses = trs[_tr].classList;
-                                for (var _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
-                                    if (trclasses.contains(s.o.ignoreRows[_ic])) {
-                                        continue trloop2;
-                                    }
-                                }
-                            }
-                            if (curval === 'ALL') {
-                                break;
-                            }
-                            else {
-                                if (typeof s.o.isToggleableTable !== "undefined") {
-                                    if (s.o.isToggleableTable === true) {
-                                        if (_tr >= recordsPerPage * 2) {
-                                            trs[_tr].classList.add('hider');
-                                        }
-                                        _tr++;
-                                    }
-                                    else {
-                                        if (_tr >= recordsPerPage) {
-                                            trs[_tr].classList.add('hider');
-                                        }
+                                var __opt;
+                                if (s.o.defaultView === 'ALL') {
+                                    __opt = _('#' + s.o.container + '-atf-paging-select option[value="ALL"]');
+                                    if (__opt) {
+                                        __opt.setAttribute('selected', 'selected');
                                     }
                                 }
                                 else {
-                                    if (_tr >= recordsPerPage) {
-                                        trs[_tr].classList.add('hider');
+                                    if (s.o.pagingViews.indexOf(s.o.defaultView) < 0) {
+                                        s.o.defaultView = s.o.pagingViews[0];
+                                    }
+                                    __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + s.o.defaultView + '"]');
+                                    if (__opt) {
+                                        __opt.setAttribute('selected', 'selected');
                                     }
                                 }
-                            }
-                        }
 
-                        //Paging buttons
-                        trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
-                        var totalRows = trs.length;
-                        var totalPages = Math.ceil(totalRows / recordsPerPage);
-                        var pagingNumberContainer = document.createElement('div');
-                        pagingNumberContainer.style.display = 'inline-block';
-                        pagingNumberContainer.classList.add('atf-paging-number-container');
-                        pagingNumberContainer.id = s.o.container + '-atf-paging-number-container';
-                        pagingEl.insertAdjacentElement('beforeend', pagingNumberContainer);
-                        for (var _i = 0; _i < totalPages; _i++) {
-                            var span = document.createElement('span');
-                            span.classList.add('atf-page-number');
-                            if (_i === 0) {
-                                span.classList.add('atf-page-number-selected');
                             }
-                            span.innerHTML = (_i + 1).toString();
-                            pagingNumberContainer.insertAdjacentElement('beforeend', span);
-                        }
-                        var pageButtons = __('.atf-page-number');
-                        for (_i = 0; _i < pageButtons.length; _i++) {
-                            pageButtons[_i].addEventListener('click', function () {
-                                for (var _x = 0; _x < pageButtons.length; _x++) {
-                                    pageButtons[_x].classList.remove('atf-page-number-selected');
-                                }
-                                this.classList.add('atf-page-number-selected');
-                                var num = +this.innerHTML;
-                                var beginning = (num - 1) * recordsPerPage;
-                                var ending = (num * recordsPerPage - 1);
-                                trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
-                                for (var _y = trs.length - 1; _y >= 0; _y--) {
-                                    if (_y > beginning - 1 && _y < ending + 1) {
-                                        trs[_y].classList.remove('hider');
-                                    }
-                                    else {
-                                        trs[_y].classList.add('hider');
-                                    }
-                                }
-                            });
-                        }
-
-                        _('#' + s.o.container + '-atf-paging-select').addEventListener('change', function () {
-                            var curval = this.options[this.selectedIndex].text;
-                            var recordsPerPage = parseInt(curval, 10);
+                            var curval = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
+                            var recordsPerPage = +curval;
                             var trs = __('#' + s.o.container + '-atf-tbody > tr');
-
-                            for (var _tr = 0; _tr < trs.length; _tr++) {
-                                trs[_tr].classList.remove('hider');
-                            }
                             trloop2:
-                            for (_tr = 0; _tr < trs.length; _tr++) {
+                            for (var _tr = 0; _tr < trs.length; _tr++) {
                                 if (typeof s.o.ignoreRows !== "undefined" && typeof s.o.ignoreRows === "object") {
                                     var trclasses = trs[_tr].classList;
                                     for (var _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
@@ -553,9 +489,8 @@ function atf() {
                                     }
                                 }
                             }
-                            //paging buttons
-                            var el = _('#' + s.o.container + '-atf-paging-number-container');
-                            el.parentNode.removeChild(el);
+
+                            //Paging buttons
                             trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
                             var totalRows = trs.length;
                             var totalPages = Math.ceil(totalRows / recordsPerPage);
@@ -580,7 +515,7 @@ function atf() {
                                         pageButtons[_x].classList.remove('atf-page-number-selected');
                                     }
                                     this.classList.add('atf-page-number-selected');
-                                    var num = parseInt(this.innerHTML, 10);
+                                    var num = +this.innerHTML;
                                     var beginning = (num - 1) * recordsPerPage;
                                     var ending = (num * recordsPerPage - 1);
                                     trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
@@ -594,21 +529,106 @@ function atf() {
                                     }
                                 });
                             }
-                        });
+
+                            _('#' + s.o.container + '-atf-paging-select').addEventListener('change', function () {
+                                var curval = this.options[this.selectedIndex].text;
+                                var recordsPerPage = parseInt(curval, 10);
+                                var trs = __('#' + s.o.container + '-atf-tbody > tr');
+
+                                for (var _tr = 0; _tr < trs.length; _tr++) {
+                                    trs[_tr].classList.remove('hider');
+                                }
+                                trloop2:
+                                for (_tr = 0; _tr < trs.length; _tr++) {
+                                    if (typeof s.o.ignoreRows !== "undefined" && typeof s.o.ignoreRows === "object") {
+                                        var trclasses = trs[_tr].classList;
+                                        for (var _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
+                                            if (trclasses.contains(s.o.ignoreRows[_ic])) {
+                                                continue trloop2;
+                                            }
+                                        }
+                                    }
+                                    if (curval === 'ALL') {
+                                        break;
+                                    }
+                                    else {
+                                        if (typeof s.o.isToggleableTable !== "undefined") {
+                                            if (s.o.isToggleableTable === true) {
+                                                if (_tr >= recordsPerPage * 2) {
+                                                    trs[_tr].classList.add('hider');
+                                                }
+                                                _tr++;
+                                            }
+                                            else {
+                                                if (_tr >= recordsPerPage) {
+                                                    trs[_tr].classList.add('hider');
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            if (_tr >= recordsPerPage) {
+                                                trs[_tr].classList.add('hider');
+                                            }
+                                        }
+                                    }
+                                }
+                                //paging buttons
+                                var el = _('#' + s.o.container + '-atf-paging-number-container');
+                                el.parentNode.removeChild(el);
+                                trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
+                                var totalRows = trs.length;
+                                var totalPages = Math.ceil(totalRows / recordsPerPage);
+                                var pagingNumberContainer = document.createElement('div');
+                                pagingNumberContainer.style.display = 'inline-block';
+                                pagingNumberContainer.classList.add('atf-paging-number-container');
+                                pagingNumberContainer.id = s.o.container + '-atf-paging-number-container';
+                                pagingEl.insertAdjacentElement('beforeend', pagingNumberContainer);
+                                for (var _i = 0; _i < totalPages; _i++) {
+                                    var span = document.createElement('span');
+                                    span.classList.add('atf-page-number');
+                                    if (_i === 0) {
+                                        span.classList.add('atf-page-number-selected');
+                                    }
+                                    span.innerHTML = (_i + 1).toString();
+                                    pagingNumberContainer.insertAdjacentElement('beforeend', span);
+                                }
+                                var pageButtons = __('.atf-page-number');
+                                for (_i = 0; _i < pageButtons.length; _i++) {
+                                    pageButtons[_i].addEventListener('click', function () {
+                                        for (var _x = 0; _x < pageButtons.length; _x++) {
+                                            pageButtons[_x].classList.remove('atf-page-number-selected');
+                                        }
+                                        this.classList.add('atf-page-number-selected');
+                                        var num = parseInt(this.innerHTML, 10);
+                                        var beginning = (num - 1) * recordsPerPage;
+                                        var ending = (num * recordsPerPage - 1);
+                                        trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
+                                        for (var _y = trs.length - 1; _y >= 0; _y--) {
+                                            if (_y > beginning - 1 && _y < ending + 1) {
+                                                trs[_y].classList.remove('hider');
+                                            }
+                                            else {
+                                                trs[_y].classList.add('hider');
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
-                }
-            }
-            else {
-                console.error("Error: pagination is set to true, but no pagingViews array was given.  Please give an array of values that correspond to the number of items to show when selected.");
-                return false;
+                    else {
+                        console.log("Error: pagination is set to true, but no pagingViews array was given.  Please give an array of values that correspond to the number of items to show when selected.");
+                        return false;
+                    }
+                })(s);
             }
         }
     }
     else if (typeof arguments[0] !== "object" || typeof arguments[0] === "undefined") {
-        console.error('Error: make sure to pass in a set of {} surrounding your properties like so:\natf({\n  table: "myTable",\n  container: "myContainer",\n  submitBy: "typing"\n});');
+        console.log('Error: make sure to pass in a set of {} surrounding your properties like so:\natf({\n  table: "myTable",\n  container: "myContainer",\n  submitBy: "typing"\n});');
     }
     else if (Object.keys(arguments[0]).length < 1) {
-        console.error('Error: no properties listed in the options object given to auto-table-filter.  Please at least specify the table, a container, and submitBy for filtering elements to perform filtering with. Remember to set these to the id values for the elements the same as the HTML id attribute i.e. a table with the id of "myFilteredTable" needs to have "myFilteredTable" passed to auto-table-filter as the table id and same with any other element based options.');
+        console.log('Error: no properties listed in the options object given to auto-table-filter.  Please at least specify the table, a container, and submitBy for filtering elements to perform filtering with. Remember to set these to the id values for the elements the same as the HTML id attribute i.e. a table with the id of "myFilteredTable" needs to have "myFilteredTable" passed to auto-table-filter as the table id and same with any other element based options.');
         return false;
     }
 
