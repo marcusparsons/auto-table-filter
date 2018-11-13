@@ -278,7 +278,7 @@ function atf() {
         }
 
         (function (s) {
-            if (s.o.container) {
+            if (s.o.container && s.o.removePrevious === true) {
                 _('#' + s.o.container).innerHTML = '';
                 if (__('#' + s.o.container + '-atf-paging-container').length > 0) {
                     var pr = _('#' + s.o.container + '-atf-paging-container').parentNode;
