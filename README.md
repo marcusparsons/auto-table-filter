@@ -146,6 +146,13 @@ You can use integer, or string, values for the number of records to show and/or 
 pagingViews: [5, 10, 25, 50, 100, "ALL"]
 ```
 
+#### removePrevious (boolean)
+The `removePrevious` parameter is optional and will only accept boolean values.  Setting this to anything other than a boolean `true` or `false` will result in this parameter defaulting to `true`.  **By default,** this value `true`.
+
+```javascript
+removePrevious: true
+```
+
 #### searchText (string)
 The `searchText ` parameter is optional and will only accept `string` values.   This parameter controls the placeholder text in the search box when a search hasn't been done yet.  **By default,** this value is `Enter a value to search for`.
 ```javascript
