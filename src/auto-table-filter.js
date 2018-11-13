@@ -273,17 +273,19 @@ function atf() {
 
         _('#' + s.o.table + ' > tbody').setAttribute("id", s.o.container + "-atf-tbody");
 
-        if (typeof s.o.removePrevious === "boolean") {
-            (function (s) {
-                if (s.o.container) {
-                    _('#' + s.o.container).innerHTML = '';
-                    if (__('#' + s.o.container + '-atf-paging-container').length > 0) {
-                        var pr = _('#' + s.o.container + '-atf-paging-container').parentNode;
-                        pr.removeChild(_('#' + s.o.container + '-atf-paging-container'));
-                    }
-                }
-            })(s);
+        if (typeof s.o.removePrevious !== "boolean") {
+            s.o.removePrevious = true;
         }
+
+        (function (s) {
+            if (s.o.container) {
+                _('#' + s.o.container).innerHTML = '';
+                if (__('#' + s.o.container + '-atf-paging-container').length > 0) {
+                    var pr = _('#' + s.o.container + '-atf-paging-container').parentNode;
+                    pr.removeChild(_('#' + s.o.container + '-atf-paging-container'));
+                }
+            }
+        })(s);
 
         //Setting up the container with filtering tools
         if (s.o.container) {
