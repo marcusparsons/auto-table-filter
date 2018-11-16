@@ -1,6 +1,6 @@
 # Auto Table Filter (atf)
 
-Auto Table Filter (atf for short, not to be confused with Alcohol, Tobacco, and Firearms in the US lol) is a project created by Marcus Parsons in 2017 in an effort to make filtering tables as easy as possible while also adding flexibility and features and keeping it lightweight.  Auto Table Filter does not rely on any outside libraries as it is written in Vanilla JavaScript. **As of right now, Auto Table Filter only supports one table per page; however, an update is planned to add support for multiple tables per page.**
+Auto Table Filter (atf for short, not to be confused with Alcohol, Tobacco, and Firearms in the US lol) is a project created by Marcus Parsons in 2017 in an effort to make filtering tables as easy as possible while also adding flexibility and features and keeping it lightweight.  Auto Table Filter does not rely on any outside libraries as it is written in Vanilla JavaScript. Auto Table Filter will support filtering on multiple tables by initializing it for each new table like you see below under **A Simple Example**.
 
 ## Table Of Contents
 1. [How To Use Auto Table Filter](#howtouse)
