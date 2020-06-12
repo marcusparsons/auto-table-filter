@@ -1,5 +1,5 @@
 /* 
-Copyright Marcus Parsons 2017-2018
+Copyright Marcus Parsons - 2017
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -14,66 +14,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-var atf_styles = {};
-//again, thanks to uiGradients for these awesome gradients!
-//http://www.uiGradients.com
-atf_styles.COOLBLUE = {
-    background: '#357ebd',
-    color: 'white'
-};
-atf_styles.BLUESKIES = {
-    background: 'linear-gradient(to right, #56ccf2, #2f80ed)',
-    color: 'white'
-};
-atf_styles.CLEARBLACK = {
-    background: 'none',
-    color: 'black'
-};
-atf_styles.CLEARWHITE = {
-    background: 'none',
-    color: 'white'
-};
-atf_styles.DEEPSEASPACE = {
-    background: 'linear-gradient(to right, #2c3e50, #4ca1af)',
-    color: 'white'
-};
-atf_styles.HYDROGEN = {
-    background: 'linear-gradient(to right, #667db6, #0082c8, #0082c8, #667db6)',
-    color: 'white'
-};
-atf_styles.LAWRENCIUM = {
-    background: 'linear-gradient(to right, #0f0c29, #302b63, #24243e)',
-    color: 'white'
-};
-atf_styles.MILD = {
-    background: 'linear-gradient(to right, #67b26f, #4ca2cd)',
-    color: 'white'
-};
-atf_styles.MOONPURPLE = {
-    background: 'linear-gradient(to right, #4e54c8, #8f94fb)',
-    color: 'white'
-};
-atf_styles.MOSS = {
-    background: 'linear-gradient(to right, #134e5e, #71b280)',
-    color: 'white'
-};
-atf_styles.ONYX = {
-    background: 'linear-gradient(to bottom, #414345, #232526)',
-    color: 'white'
-};
-atf_styles.RAINBOWBLUE = {
-    background: 'linear-gradient(to right, #00f260, #0575e6)',
-    color: 'white'
-};
-atf_styles.STRIPE = {
-    background: 'linear-gradient(to right, #1fa2ff, #12d8fa, #a6ffcb)',
-    color: 'white'
-};
-atf_styles.VENICE = {
-    background: 'linear-gradient(to right, #6190e8, #a7bfe8)',
-    color: 'white'
-};
-
 //Created by Marcus Parsons - Copyright 2017
 function atf() {
     var s = this;
@@ -81,83 +21,149 @@ function atf() {
     var _ = document.querySelector.bind(document);
     var __ = document.querySelectorAll.bind(document);
 
+    this.styles = {};
+    //again, thanks to uiGradients for these awesome gradients!
+    //http://www.uiGradients.com
+    this.styles.COOLBLUE = {
+        background: '#357ebd',
+        color: 'white'
+    };
+    this.styles.BLUESKIES = {
+        background: 'linear-gradient(to right, #56ccf2, #2f80ed)',
+        color: 'white'
+    };
+    this.styles.CLEARBLACK = {
+        background: 'none',
+        color: 'black'
+    };
+    this.styles.CLEARWHITE = {
+        background: 'none',
+        color: 'white'
+    };
+    this.styles.DEEPSEASPACE = {
+        background: 'linear-gradient(to right, #2c3e50, #4ca1af)',
+        color: 'white'
+    };
+    this.styles.HYDROGEN = {
+        background: 'linear-gradient(to right, #667db6, #0082c8, #0082c8, #667db6)',
+        color: 'white'
+    };
+    this.styles.LAWRENCIUM = {
+        background: 'linear-gradient(to right, #0f0c29, #302b63, #24243e)',
+        color: 'white'
+    };
+    this.styles.MILD = {
+        background: 'linear-gradient(to right, #67b26f, #4ca2cd)',
+        color: 'white'
+    };
+    this.styles.MOONPURPLE = {
+        background: 'linear-gradient(to right, #4e54c8, #8f94fb)',
+        color: 'white'
+    };
+    this.styles.MOSS = {
+        background: 'linear-gradient(to right, #134e5e, #71b280)',
+        color: 'white'
+    };
+    this.styles.ONYX = {
+        background: 'linear-gradient(to bottom, #414345, #232526)',
+        color: 'white'
+    };
+    this.styles.RAINBOWBLUE = {
+        background: 'linear-gradient(to right, #00f260, #0575e6)',
+        color: 'white'
+    };
+    this.styles.STRIPE = {
+        background: 'linear-gradient(to right, #1fa2ff, #12d8fa, #a6ffcb)',
+        color: 'white'
+    };
+    this.styles.VENICE = {
+        background: 'linear-gradient(to right, #6190e8, #a7bfe8)',
+        color: 'white'
+    };
+
 
     //update a property
     this.update = function (prop, obj) {
-        if (typeof obj !== "undefined") {
-            if (typeof obj === "object") {
-                switch (prop) {
-                    case "styles":
-                        var keys = Object.keys(obj),
-                            key;
-                        for (i = 0; i < keys.length; i++) {
-                            key = keys[i];
-                            if (_('#' + s.o.container).style.hasOwnProperty(key)) {
-                                _('#' + s.o.container).style[key] = obj[key];
-                            }
+        if (typeof obj === "object") {
+            switch (prop) {
+                case "styles":
+                    var keys = Object.keys(obj),
+                        key;
+                    for (i = 0; i < keys.length; i++) {
+                        key = keys[i];
+                        if (_('#' + s.o.container).style.hasOwnProperty(key)) {
+                            _('#' + s.o.container).style[key] = obj[key];
                         }
-                        break;
-                }
+                    }
+                    break;
             }
-            else {
-                s.o[prop] = obj;
-                switch (prop) {
-                    case "searchText":
-                        _('#' + s.o.container + '-atf-filtervalue').setAttribute("placeholder", s.o[prop]);
-                        break;
-                }
+        }
+        else {
+            s.o[prop] = obj;
+            switch (prop) {
+                case "searchText":
+                    _('#' + s.o.container + '-atf-filtervalue').setAttribute("placeholder", s.o[prop]);
+                    break;
             }
         }
     };
 
     //Remove a column from the filter selection
-    this.removeColumn = function (columnName) {
+    this.removeColumn = function (columnName, partialMatch) {
+        if (!partialMatch) {
+            partialMatch = false;
+        }
+
         if (columnName) {
-            var el = _('#' + s.o.container + '-atf-filterselect option[value="' + columnName + '"]');
-            if (el) {
+            var selector = '#' + s.o.container + '-atf-filterselect option[value' + ((partialMatch) ? '*' : '') + '="' + columnName + '"]';
+
+            var el = __(selector);
+            if (el.length > 0) {
                 var parentNode = _('#' + s.o.container + '-atf-filterselect');
-                parentNode.removeChild(el);
+                for (var i = 0; i < el.length; i++) {
+                    var innerEl = el[i];
+                    parentNode.removeChild(innerEl);
+                }
+
             }
         }
     }
 
-    //Add a number to the pagination select
+    //Add a number to the paging select
     this.addPagingOpt = function (val) {
-        if (typeof val !== "undefined") {
-            if (typeof val === "string" || typeof val === "number") {
-                val = (typeof val === "string") ? parseInt(val, 10) : val;
-                if (!isNaN(val)) {
-                    var sel = _('#' + s.o.container + '-atf-paging-select');
-                    var opts = sel.querySelectorAll('option');
-                    var a = [];
-                    var dregx = /^[0-9]+$/;
-                    var ia = false;
-                    for (var i = 0; i < opts.length; i++) {
-                        if (dregx.test(opts[i].innerHTML.trim()) === true) {
-                            a.push(+opts[i].innerHTML);
-                        }
-                        if (opts[i].innerHTML.toUpperCase() === 'ALL') {
-                            ia = true;
-                        }
+        if (typeof val === "string" || typeof val === "number") {
+            val = (typeof val === "string") ? parseInt(val, 10) : val;
+            if (!isNaN(val)) {
+                var sel = _('#' + s.o.container + '-atf-paging-select');
+                var opts = sel.querySelectorAll('option');
+                var a = [];
+                var dregx = /^[0-9]+$/;
+                var ia = false;
+                for (var i = 0; i < opts.length; i++) {
+                    if (dregx.test(opts[i].innerHTML.trim()) === true) {
+                        a.push(+opts[i].innerHTML);
                     }
-                    a.push(val);
-                    a.sort(function (a, b) {
-                        if (a > b) return 1;
-                        if (a < b) return -1;
-                        return 0;
-                    });
-                    if (ia) {
-                        a.push("ALL");
+                    if (opts[i].innerHTML.toUpperCase() === 'ALL') {
+                        ia = true;
                     }
-                    sel.innerHTML = '';
-                    for (var n in a) {
-                        sel.innerHTML += '<option value="' + a[n] + '">' + a[n] + '</option>';
-                    }
-                    if (typeof s.o.defaultView !== "undefined") {
-                        var __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + s.o.defaultView + '"]');
-                        if (__opt) {
-                            __opt.setAttribute('selected', 'selected');
-                        }
+                }
+                a.push(val);
+                a.sort(function (a, b) {
+                    if (a > b) return 1;
+                    if (a < b) return -1;
+                    return 0;
+                });
+                if (ia) {
+                    a.push("ALL");
+                }
+                sel.innerHTML = '';
+                for (var n in a) {
+                    sel.innerHTML += '<option value="' + a[n] + '">' + a[n] + '</option>';
+                }
+                if (typeof s.o.defaultView !== "undefined") {
+                    var __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + s.o.defaultView + '"]');
+                    if (__opt) {
+                        __opt.setAttribute('selected', 'selected');
                     }
                 }
             }
@@ -165,17 +171,15 @@ function atf() {
     };
 
     this.removePagingOpt = function (val) {
-        if (typeof val !== "undefined") {
-            if (typeof val === "string" || typeof val === "number") {
-                var __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + val + '"]');
-                if (__opt) {
-                    __opt.remove();
-                }
-                if (typeof s.o.defaultView !== "undefined") {
-                    if (s.o.defaultView.toString() === val.toString()) {
-                        var els = __('#' + s.o.container + '-atf-paging-select option');
-                        s.o.defaultView = els[0];
-                    }
+        if (typeof val === "string" || typeof val === "number") {
+            var __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + val + '"]');
+            if (__opt) {
+                __opt.remove();
+            }
+            if (typeof s.o.defaultView !== "undefined") {
+                if (s.o.defaultView.toString() === val.toString()) {
+                    var els = __('#' + s.o.container + '-atf-paging-select option');
+                    s.o.defaultView = els[0];
                 }
             }
         }
@@ -187,7 +191,7 @@ function atf() {
         filterval = (s.o.caseSensitive) ? _('#' + s.o.container + '-atf-filtervalue').value : _('#' + s.o.container + '-atf-filtervalue').value.toLowerCase();
         var ths = __('#' + s.o.table + ' thead > tr > th');
         for (var i = 0; i < ths.length; i++) {
-            var thval = ths[i].innerHTML.trim();
+            var thval = (ths[i].querySelectorAll('*').length > 0 ? ths[i].childNodes[0].valueOf().textContent : ths[i].innerText.trim());
             filters.push(thval);
         }
         var trs = __('#' + s.o.container + '-atf-tbody > tr');
@@ -199,7 +203,16 @@ function atf() {
                 for (var m = 0; m < tdlist.length; m++) {
                     var tdhtml = (s.o.caseSensitive) ? tdlist[m].innerHTML : tdlist[m].innerHTML.toLowerCase();
                     if (tdhtml.indexOf(filterval) > -1) {
-                        curtr.classList.remove('hider');
+                        if (curtr.classList.contains('hider')) {
+                            curtr.classList.remove('hider');
+                        }
+                        else {
+                            if (s.o.isToggleableTable && curtr.previousElementSibling) {
+                                if (curtr.previousElementSibling.classList.contains('hider')) {
+                                    curtr.previousElementSibling.classList.remove('hider');
+                                }
+                            }
+                        }
                         break tdloop;
                     }
                     else {
@@ -217,28 +230,40 @@ function atf() {
                 tdlist = curtr.getElementsByTagName('td');
                 tdhtml = (s.o.caseSensitive === true) ? tdlist[fi].innerHTML : tdlist[fi].innerHTML.toLowerCase();
                 if (tdhtml.indexOf(filterval) > -1) {
-                    curtr.classList.remove('hider');
+                    if (curtr.classList.contains('hider')) {
+                        curtr.classList.remove('hider');
+                    }
+                    else {
+                        if (s.o.isToggleableTable && curtr.previousElementSibling) {
+                            if (curtr.previousElementSibling.classList.contains('hider')) {
+                                curtr.previousElementSibling.classList.remove('hider');
+                            }
+                        }
+                    }
                 }
                 else {
                     curtr.classList.add('hider');
                 }
             }
         }
-    }
 
+        if (typeof s.o.onSearched === "function") {
+            s.o.onSearched();
+        }
+    }
 
     if (typeof arguments[0] === "object" && Object.keys(arguments[0]).length) {
         var options = arguments[0];
         var availoptions = ['table', 'container', 'submitBy', 'display', 'includeLabel', 'labelText', 'isToggleableTable', 'searchText',
-            'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'pagination', 'pagingViews', 'defaultView', 'onComplete', 'removePrevious'];
+            'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'paging', 'pagingViews', 'defaultView', 'onComplete', 'onSearched', 'removePrevious'];
         var givenoptions = Object.keys(options);
 
         if (givenoptions.indexOf('table') < 0) {
-            console.log('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
+            console.error('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
             return false;
         }
         if (givenoptions.indexOf('container') < 0) {
-            console.log('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
+            console.error('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
             return false;
         }
         for (var i = 0; i < availoptions.length; i++) {
@@ -267,14 +292,34 @@ function atf() {
         }
 
         if (!s.o.table) {
-            console.log('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
+            console.error('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
             return false;
         }       
 
         _('#' + s.o.table + ' > tbody').setAttribute("id", s.o.container + "-atf-tbody");
 
+        //GOTO HERE
+        //THIS HAS TO BE REDONE (TEMP FOR TEMP SORTING)
+        //NEEDS TO BE ADDED IN AS A FEATURE (USE BASICALLY EXISTING CODE YOU MADE ON THE JOBS INDEX PAGE)
+        (function () {
+            var trs = __('#' + s.o.table + ' > tbody > tr');
+            for (var i = 0; i < trs.length; i++) {
+                var tr = trs[i];
+                tr.setAttribute("data-atf-index", i);
+            }
+        })();
+        
+
         if (typeof s.o.removePrevious !== "boolean") {
             s.o.removePrevious = true;
+        }
+
+        if (typeof s.o.ignoreRows === "object") {
+            if (s.o.ignoreRows.length > 0) {
+                s.o.ignoreRowsSelector = s.o.ignoreRows.map(function (r) {
+                    return '.' + r;
+                }).join(',');
+            }
         }
 
         (function (s) {
@@ -290,10 +335,20 @@ function atf() {
         //Setting up the container with filtering tools
         if (s.o.container) {
             (function (s) {
+                var keys;
                 _('#' + s.o.container).classList.add('atf-filter-container');
-                if (typeof s.o.styles !== "undefined") {
-                    if (typeof s.o.styles === "object") {
-                        var keys = Object.keys(s.o.styles);
+                if (typeof s.o.styles === "string") {
+                    s.o.styles = s.o.styles.toUpperCase();
+                    if (s.styles.hasOwnProperty(s.o.styles)) {
+                        keys = Object.keys(s.styles[s.o.styles]);
+                        for (i = 0; i < keys.length; i++) {
+                            if (_('#' + s.o.container).style.hasOwnProperty([keys[i]])) {
+                                _('#' + s.o.container).style[keys[i]] = s.styles[s.o.styles][keys[i]];
+                            }
+                        }
+                    }
+                    else if (typeof s.o.styles === "object") {
+                        keys = Object.keys(s.o.styles);
                         for (i = 0; i < keys.length; i++) {
                             if (_('#' + s.o.container).style.hasOwnProperty([keys[i]])) {
                                 _('#' + s.o.container).style[keys[i]] = s.o.styles[keys[i]];
@@ -315,7 +370,7 @@ function atf() {
                 var ths = __('#' + s.o.table + ' > thead > tr > th');
                 var seloptions = "<option value='All' selected='selected'>All</option>";
                 for (i = 0; i < ths.length; i++) {
-                    var thval = ths[i].innerHTML.trim();
+                    var thval = (ths[i].querySelectorAll('*').length > 0 ? ths[i].childNodes[0].valueOf().textContent : ths[i].innerText.trim());
                     if (thval !== '') {
                         seloptions += "<option value='" + thval + "'>" + thval + "</option>";
                     }
@@ -328,18 +383,22 @@ function atf() {
                 }
 
                 _('#' + s.o.container + '-atf-filtervalue').addEventListener('keyup', function (e) {
+                    if (e.which === 27) {
+                        _('#' + s.o.container + '-atf-filtervalue').value = '';
+                        filter('container');
+                    }
                     if (e.which === 13 && (s.o.submitBy === 'button' || !s.o.submitBy)) {
                         filter('container');
                     }
                     if (e.which === 8 && _('#' + s.o.container + '-atf-filtervalue').value === '') {
                         var trs = __('#' + s.o.container + '-atf-tbody > tr');
-                        if (typeof s.o.pagination === "undefined") {
+                        if (typeof s.o.paging === "undefined") {
                             for (i = 0; i < trs.length; i++) {
                                 trs[i].classList.remove('hider');
                             }
                         }
                         else {
-                            var curopttxt = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
+                            var curopttxt = (__('#' + s.o.container + '-atf-paging-select').length > 0) ? _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text : 'ALL';
                             if (curopttxt !== 'ALL') {
                                 var curval = +curopttxt;
                                 var curselopt = __('.atf-page-number-selected');
@@ -399,9 +458,9 @@ function atf() {
             })(s);
         }
 
-        //Pagination
-        if (typeof s.o.pagination !== "undefined") {
-            if (s.o.pagination === true) {
+        //paging
+        if (typeof s.o.paging !== "undefined") {
+            if (s.o.paging === true) {
                 (function (s) {
                     var pagingEl = document.createElement("div");
                     pagingEl.id = s.o.container + '-atf-paging-container';
@@ -409,7 +468,7 @@ function atf() {
                     _('#' + s.o.container).insertAdjacentElement('afterend', pagingEl);
                     if (typeof s.o.pagingViews !== "undefined") {
                         if (s.o.pagingViews.length < 1) {
-                            console.log("Error: pagination is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
+                            console.error("Error: paging is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
                             return false;
                         }
                         else {
@@ -493,7 +552,11 @@ function atf() {
                             }
 
                             //Paging buttons
-                            trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
+                            var selector = '#' + s.o.container + '-atf-tbody > tr';
+                            if (typeof s.o.ignoreRowsSelector === "string") {
+                                selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                            }
+                            trs = __(selector);
                             var totalRows = trs.length;
                             var totalPages = Math.ceil(totalRows / recordsPerPage);
                             var pagingNumberContainer = document.createElement('div');
@@ -520,7 +583,11 @@ function atf() {
                                     var num = +this.innerHTML;
                                     var beginning = (num - 1) * recordsPerPage;
                                     var ending = (num * recordsPerPage - 1);
-                                    trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
+                                    var selector = '#' + s.o.container + '-atf-tbody > tr';
+                                    if (typeof s.o.ignoreRowsSelector === "string") {
+                                        selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                    }
+                                    trs = __(selector);
                                     for (var _y = trs.length - 1; _y >= 0; _y--) {
                                         if (_y > beginning - 1 && _y < ending + 1) {
                                             trs[_y].classList.remove('hider');
@@ -577,7 +644,11 @@ function atf() {
                                 //paging buttons
                                 var el = _('#' + s.o.container + '-atf-paging-number-container');
                                 el.parentNode.removeChild(el);
-                                trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
+                                var selector = '#' + s.o.container + '-atf-tbody > tr';
+                                if (typeof s.o.ignoreRowsSelector === "string") {
+                                    selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                }
+                                trs = __(selector);
                                 var totalRows = trs.length;
                                 var totalPages = Math.ceil(totalRows / recordsPerPage);
                                 var pagingNumberContainer = document.createElement('div');
@@ -604,7 +675,11 @@ function atf() {
                                         var num = parseInt(this.innerHTML, 10);
                                         var beginning = (num - 1) * recordsPerPage;
                                         var ending = (num * recordsPerPage - 1);
-                                        trs = __('#' + s.o.container + '-atf-tbody > tr:not(.is-hidden)');
+                                        var selector = '#' + s.o.container + '-atf-tbody > tr';
+                                        if (typeof s.o.ignoreRowsSelector === "string") {
+                                            selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                        }
+                                        trs = __(selector);
                                         for (var _y = trs.length - 1; _y >= 0; _y--) {
                                             if (_y > beginning - 1 && _y < ending + 1) {
                                                 trs[_y].classList.remove('hider');
@@ -619,7 +694,7 @@ function atf() {
                         }
                     }
                     else {
-                        console.log("Error: pagination is set to true, but no pagingViews array was given.  Please give an array of values that correspond to the number of items to show when selected.");
+                        console.error("Error: paging is set to true, but no pagingViews array was given.  Please give an array of values that correspond to the number of items to show when selected.");
                         return false;
                     }
                 })(s);
@@ -627,10 +702,10 @@ function atf() {
         }
     }
     else if (typeof arguments[0] !== "object" || typeof arguments[0] === "undefined") {
-        console.log('Error: make sure to pass in a set of {} surrounding your properties like so:\natf({\n  table: "myTable",\n  container: "myContainer",\n  submitBy: "typing"\n});');
+        console.error('Error: make sure to pass in a set of {} surrounding your properties like so:\natf({\n  table: "myTable",\n  container: "myContainer",\n  submitBy: "typing"\n});');
     }
     else if (Object.keys(arguments[0]).length < 1) {
-        console.log('Error: no properties listed in the options object given to auto-table-filter.  Please at least specify the table, a container, and submitBy for filtering elements to perform filtering with. Remember to set these to the id values for the elements the same as the HTML id attribute i.e. a table with the id of "myFilteredTable" needs to have "myFilteredTable" passed to auto-table-filter as the table id and same with any other element based options.');
+        console.error('Error: no properties listed in the options object given to auto-table-filter.  Please at least specify the table, a container, and submitBy for filtering elements to perform filtering with. Remember to set these to the id values for the elements the same as the HTML id attribute i.e. a table with the id of "myFilteredTable" needs to have "myFilteredTable" passed to auto-table-filter as the table id and same with any other element based options.');
         return false;
     }
 
