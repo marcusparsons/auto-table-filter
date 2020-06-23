@@ -132,10 +132,10 @@ onComplete: function () {
 }
 ```
 
-#### pagination (boolean)
-The `pagination ` parameter is optional and only accepts a `boolean` for its input.   This parameter allows you to set pages of records for your table.  **If you set this to true, you must specify a `pagingViews` parameter. By default,** this parameter is set to `false`.  If `defaultView` is omitted, pagination defaults to the first specified value.
+#### paging (boolean)
+The `paging` parameter is optional and only accepts a `boolean` for its input.   This parameter allows you to set pages of records for your table.  **If you set this to true, you must specify a `pagingViews` parameter. By default,** this parameter is set to `false`.  If `defaultView` is omitted, `paging` defaults to the first specified value.
 ```javascript
-pagination: false
+paging: false
 ```
 
 #### pagingViews (array)
