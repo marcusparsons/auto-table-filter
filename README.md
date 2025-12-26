@@ -218,11 +218,11 @@ If you have any bug fixes or implementations you'd like to see and are willing t
 
 <a id="copyright"></a>
 ## Copyright 
-Copyright Marcus Parsons 2017-2018
+Copyright Marcus Parsons 2017 to Present
 
 ## Licensing <a id="licensing"></a>
 
-This program is free software: you can redistribute it and/or modify    
+This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.

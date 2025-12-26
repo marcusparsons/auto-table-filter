@@ -1,5 +1,5 @@
 /* 
-Copyright Marcus Parsons - 2017
+Copyright Marcus Parsons - 2017 to Present
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -16,10 +16,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //Created by Marcus Parsons - Copyright 2017
 function atf() {
-    var s = this;
+    const s = this;
     s.o = {};
-    var _ = document.querySelector.bind(document);
-    var __ = document.querySelectorAll.bind(document);
+    const _ = document.querySelector.bind(document);
+    const __ = document.querySelectorAll.bind(document);
 
     this.styles = {};
     //again, thanks to uiGradients for these awesome gradients!
@@ -83,63 +83,60 @@ function atf() {
 
 
     //update a property
-    this.update = function (prop, obj) {
+    this.update = (prop, obj) => {
         if (typeof obj === "object") {
             switch (prop) {
-                case "styles":
-                    var keys = Object.keys(obj),
-                        key;
-                    for (i = 0; i < keys.length; i++) {
-                        key = keys[i];
-                        if (_('#' + s.o.container).style.hasOwnProperty(key)) {
-                            _('#' + s.o.container).style[key] = obj[key];
+                case "styles": {
+                    const keys = Object.keys(obj);
+                    for (let i = 0; i < keys.length; i++) {
+                        const key = keys[i];
+                        const containerEl = _(`#${s.o.container}`);
+                        if (containerEl && Object.prototype.hasOwnProperty.call(containerEl.style, key)) {
+                            containerEl.style[key] = obj[key];
                         }
                     }
                     break;
+                }
             }
         }
         else {
             s.o[prop] = obj;
             switch (prop) {
                 case "searchText":
-                    _('#' + s.o.container + '-atf-filtervalue').setAttribute("placeholder", s.o[prop]);
+                    _(`#${s.o.container}-atf-filtervalue`).setAttribute("placeholder", s.o[prop]);
                     break;
             }
         }
     };
 
     //Remove a column from the filter selection
-    this.removeColumn = function (columnName, partialMatch) {
-        if (!partialMatch) {
-            partialMatch = false;
-        }
-
+    this.removeColumn = (columnName, partialMatch = false) => {
         if (columnName) {
-            var selector = '#' + s.o.container + '-atf-filterselect option[value' + ((partialMatch) ? '*' : '') + '="' + columnName + '"]';
+            const selector = `#${s.o.container}-atf-filterselect option[value${(partialMatch) ? '*' : ''}="${columnName}"]`;
 
-            var el = __(selector);
+            const el = __(selector);
             if (el.length > 0) {
-                var parentNode = _('#' + s.o.container + '-atf-filterselect');
-                for (var i = 0; i < el.length; i++) {
-                    var innerEl = el[i];
+                const parentNode = _(`#${s.o.container}-atf-filterselect`);
+                for (let i = 0; i < el.length; i++) {
+                    const innerEl = el[i];
                     parentNode.removeChild(innerEl);
                 }
-
             }
         }
-    }
+    };
 
     //Add a number to the paging select
-    this.addPagingOpt = function (val) {
+    this.addPagingOpt = (val) => {
         if (typeof val === "string" || typeof val === "number") {
             val = (typeof val === "string") ? parseInt(val, 10) : val;
             if (!isNaN(val)) {
-                var sel = _('#' + s.o.container + '-atf-paging-select');
-                var opts = sel.querySelectorAll('option');
-                var a = [];
-                var dregx = /^[0-9]+$/;
-                var ia = false;
-                for (var i = 0; i < opts.length; i++) {
+                const sel = _(`#${s.o.container}-atf-paging-select`);
+                const opts = sel.querySelectorAll('option');
+                const a = [];
+                const dregx = /^[0-9]+$/;
+                let ia = false;
+
+                for (let i = 0; i < opts.length; i++) {
                     if (dregx.test(opts[i].innerHTML.trim()) === true) {
                         a.push(+opts[i].innerHTML);
                     }
@@ -147,21 +144,25 @@ function atf() {
                         ia = true;
                     }
                 }
+
                 a.push(val);
-                a.sort(function (a, b) {
+                a.sort((a, b) => {
                     if (a > b) return 1;
                     if (a < b) return -1;
                     return 0;
                 });
+
                 if (ia) {
                     a.push("ALL");
                 }
+
                 sel.innerHTML = '';
-                for (var n in a) {
-                    sel.innerHTML += '<option value="' + a[n] + '">' + a[n] + '</option>';
+                for (const n of a) {
+                    sel.innerHTML += `<option value="${n}">${n}</option>`;
                 }
+
                 if (typeof s.o.defaultView !== "undefined") {
-                    var __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + s.o.defaultView + '"]');
+                    const __opt = _(`#${s.o.container}-atf-paging-select option[value="${s.o.defaultView}"]`);
                     if (__opt) {
                         __opt.setAttribute('selected', 'selected');
                     }
@@ -170,15 +171,15 @@ function atf() {
         }
     };
 
-    this.removePagingOpt = function (val) {
+    this.removePagingOpt = (val) => {
         if (typeof val === "string" || typeof val === "number") {
-            var __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + val + '"]');
+            const __opt = _(`#${s.o.container}-atf-paging-select option[value="${val}"]`);
             if (__opt) {
                 __opt.remove();
             }
             if (typeof s.o.defaultView !== "undefined") {
                 if (s.o.defaultView.toString() === val.toString()) {
-                    var els = __('#' + s.o.container + '-atf-paging-select option');
+                    const els = __(`#${s.o.container}-atf-paging-select option`);
                     s.o.defaultView = els[0];
                 }
             }
@@ -186,22 +187,29 @@ function atf() {
     };
 
     function filter() {
-        var filtertype, filterval, filters = [];
-        filtertype = _('#' + s.o.container + '-atf-filterselect').value;
-        filterval = (s.o.caseSensitive) ? _('#' + s.o.container + '-atf-filtervalue').value : _('#' + s.o.container + '-atf-filtervalue').value.toLowerCase();
-        var ths = __('#' + s.o.table + ' thead > tr > th');
-        for (var i = 0; i < ths.length; i++) {
-            var thval = (ths[i].querySelectorAll('*').length > 0 ? ths[i].childNodes[0].valueOf().textContent : ths[i].innerText.trim());
+        let filtertype, filterval;
+        const filters = [];
+
+        filtertype = _(`#${s.o.container}-atf-filterselect`).value;
+        filterval = (s.o.caseSensitive)
+            ? _(`#${s.o.container}-atf-filtervalue`).value
+            : _(`#${s.o.container}-atf-filtervalue`).value.toLowerCase();
+
+        const ths = __(`#${s.o.table} thead > tr > th`);
+        for (let i = 0; i < ths.length; i++) {
+            const thval = (ths[i].querySelectorAll('*').length > 0 ? ths[i].childNodes[0].valueOf().textContent : ths[i].innerText.trim());
             filters.push(thval);
         }
-        var trs = __('#' + s.o.container + '-atf-tbody > tr');
+
+        const trs = __(`#${s.o.container}-atf-tbody > tr`);
         if (filtertype === 'All') {
-            for (i = 0; i < trs.length; i++) {
-                var tdlist = trs[i].getElementsByTagName('td');
-                var curtr = trs[i];
+            for (let i = 0; i < trs.length; i++) {
+                const tdlist = trs[i].getElementsByTagName('td');
+                const curtr = trs[i];
+
                 tdloop:
-                for (var m = 0; m < tdlist.length; m++) {
-                    var tdhtml = (s.o.caseSensitive) ? tdlist[m].innerHTML : tdlist[m].innerHTML.toLowerCase();
+                for (let m = 0; m < tdlist.length; m++) {
+                    const tdhtml = (s.o.caseSensitive) ? tdlist[m].innerHTML : tdlist[m].innerHTML.toLowerCase();
                     if (tdhtml.indexOf(filterval) > -1) {
                         if (curtr.classList.contains('hider')) {
                             curtr.classList.remove('hider');
@@ -224,11 +232,11 @@ function atf() {
             }
         }
         else {
-            var fi = filters.indexOf(filtertype);
-            for (i = 0; i < trs.length; i++) {
-                curtr = trs[i];
-                tdlist = curtr.getElementsByTagName('td');
-                tdhtml = (s.o.caseSensitive === true) ? tdlist[fi].innerHTML : tdlist[fi].innerHTML.toLowerCase();
+            const fi = filters.indexOf(filtertype);
+            for (let i = 0; i < trs.length; i++) {
+                const curtr = trs[i];
+                const tdlist = curtr.getElementsByTagName('td');
+                const tdhtml = (s.o.caseSensitive === true) ? tdlist[fi].innerHTML : tdlist[fi].innerHTML.toLowerCase();
                 if (tdhtml.indexOf(filterval) > -1) {
                     if (curtr.classList.contains('hider')) {
                         curtr.classList.remove('hider');
@@ -253,10 +261,10 @@ function atf() {
     }
 
     if (typeof arguments[0] === "object" && Object.keys(arguments[0]).length) {
-        var options = arguments[0];
-        var availoptions = ['table', 'container', 'submitBy', 'display', 'includeLabel', 'labelText', 'isToggleableTable', 'searchText',
+        const options = arguments[0];
+        const availoptions = ['table', 'container', 'submitBy', 'display', 'includeLabel', 'labelText', 'isToggleableTable', 'searchText',
             'styles', 'columnSelect', 'ignoreRows', 'caseSensitive', 'paging', 'pagingViews', 'defaultView', 'onComplete', 'onSearched', 'removePrevious'];
-        var givenoptions = Object.keys(options);
+        const givenoptions = Object.keys(options);
 
         if (givenoptions.indexOf('table') < 0) {
             console.error('Error: no table listed in options given to auto-table-filter.  Please at least specify the table and a container to perform filtering with.');
@@ -266,10 +274,12 @@ function atf() {
             console.error('Error: no container listed in options given to auto-table-filter.  Please specify a container to perform filtering with by specifying its id i.e.\ncontainer: "myContainer".');
             return false;
         }
-        for (var i = 0; i < availoptions.length; i++) {
-            var optval = options[availoptions[i]];
-            var prop = availoptions[i];
-            var coll = ["boolean", "string", "number", "function"];
+
+        for (let i = 0; i < availoptions.length; i++) {
+            const optval = options[availoptions[i]];
+            const prop = availoptions[i];
+            const coll = ["boolean", "string", "number", "function"];
+
             if (typeof optval !== "undefined") {
                 if (coll.indexOf(typeof optval) > -1) {
                     s.o[prop] = optval;
@@ -277,14 +287,16 @@ function atf() {
                 else if (typeof optval === "object") {
                     if (optval instanceof Array) {
                         s.o[prop] = [];
-                        for (var _z = 0; _z < optval.length; _z++) {
+                        for (let _z = 0; _z < optval.length; _z++) {
                             s.o[prop].push(optval[_z]);
                         }
                     }
                     else {
                         s.o[prop] = {};
-                        for (var key in optval) {
-                            s.o[prop][key] = optval[key];
+                        for (const key in optval) {
+                            if (Object.prototype.hasOwnProperty.call(optval, key)) {
+                                s.o[prop][key] = optval[key];
+                            }
                         }
                     }
                 }
@@ -294,21 +306,21 @@ function atf() {
         if (!s.o.table) {
             console.error('Error: please make sure to specify an id for the table being filtered.  Use the same format as the id attribute in HTML i.e. a table with id="myFilteredTable" needs the table property set to "myFilteredTable".');
             return false;
-        }       
+        }
 
-        _('#' + s.o.table + ' > tbody').setAttribute("id", s.o.container + "-atf-tbody");
+        _(`#${s.o.table} > tbody`).setAttribute("id", `${s.o.container}-atf-tbody`);
 
         //GOTO HERE
         //THIS HAS TO BE REDONE (TEMP FOR TEMP SORTING)
         //NEEDS TO BE ADDED IN AS A FEATURE (USE BASICALLY EXISTING CODE YOU MADE ON THE JOBS INDEX PAGE)
-        (function () {
-            var trs = __('#' + s.o.table + ' > tbody > tr');
-            for (var i = 0; i < trs.length; i++) {
-                var tr = trs[i];
+        (() => {
+            const trs = __(`#${s.o.table} > tbody > tr`);
+            for (let i = 0; i < trs.length; i++) {
+                const tr = trs[i];
                 tr.setAttribute("data-atf-index", i);
             }
         })();
-        
+
 
         if (typeof s.o.removePrevious !== "boolean") {
             s.o.removePrevious = true;
@@ -316,114 +328,126 @@ function atf() {
 
         if (typeof s.o.ignoreRows === "object") {
             if (s.o.ignoreRows.length > 0) {
-                s.o.ignoreRowsSelector = s.o.ignoreRows.map(function (r) {
-                    return '.' + r;
-                }).join(',');
+                s.o.ignoreRowsSelector = s.o.ignoreRows.map((r) => `.${r}`).join(',');
             }
         }
 
-        (function (s) {
+        ((s) => {
             if (s.o.container && s.o.removePrevious === true) {
-                _('#' + s.o.container).innerHTML = '';
-                if (__('#' + s.o.container + '-atf-paging-container').length > 0) {
-                    var pr = _('#' + s.o.container + '-atf-paging-container').parentNode;
-                    pr.removeChild(_('#' + s.o.container + '-atf-paging-container'));
+                _(`#${s.o.container}`).innerHTML = '';
+                if (__(`#${s.o.container}-atf-paging-container`).length > 0) {
+                    const pr = _(`#${s.o.container}-atf-paging-container`).parentNode;
+                    pr.removeChild(_(`#${s.o.container}-atf-paging-container`));
                 }
             }
         })(s);
 
         //Setting up the container with filtering tools
         if (s.o.container) {
-            (function (s) {
-                var keys;
-                _('#' + s.o.container).classList.add('atf-filter-container');
+            ((s) => {
+                let keys;
+                _(`#${s.o.container}`).classList.add('atf-filter-container');
                 if (typeof s.o.styles === "string") {
                     s.o.styles = s.o.styles.toUpperCase();
                     if (s.styles.hasOwnProperty(s.o.styles)) {
                         keys = Object.keys(s.styles[s.o.styles]);
-                        for (i = 0; i < keys.length; i++) {
-                            if (_('#' + s.o.container).style.hasOwnProperty([keys[i]])) {
-                                _('#' + s.o.container).style[keys[i]] = s.styles[s.o.styles][keys[i]];
+                        for (let i = 0; i < keys.length; i++) {
+                            const containerEl = _(`#${s.o.container}`);
+                            if (containerEl && Object.prototype.hasOwnProperty.call(containerEl.style, keys[i])) {
+                                containerEl.style[keys[i]] = s.styles[s.o.styles][keys[i]];
                             }
                         }
                     }
                     else if (typeof s.o.styles === "object") {
                         keys = Object.keys(s.o.styles);
-                        for (i = 0; i < keys.length; i++) {
-                            if (_('#' + s.o.container).style.hasOwnProperty([keys[i]])) {
-                                _('#' + s.o.container).style[keys[i]] = s.o.styles[keys[i]];
+                        for (let i = 0; i < keys.length; i++) {
+                            const containerEl = _(`#${s.o.container}`);
+                            if (containerEl && Object.prototype.hasOwnProperty.call(containerEl.style, keys[i])) {
+                                containerEl.style[keys[i]] = s.o.styles[keys[i]];
                             }
                         }
                     }
                 }
-                _('#' + s.o.container).innerHTML = ((typeof s.o.includeLabel === "undefined" || s.o.includeLabel === true) ? "<label for='atf-filtervalue'>" + ((typeof s.o.labelText !== "undefined" && typeof s.o.labelText === "string") ? s.o.labelText : "Search:") + "</label> &nbsp;" : "") + "<input type='text' class='atf-filtervalue' id='" + s.o.container + "-atf-filtervalue' placeholder='" + ((typeof s.o.searchText === "undefined" || s.o.searchText === "") ? "Enter a value to search for" : s.o.searchText) + "'>";
+
+                _(`#${s.o.container}`).innerHTML =
+                    ((typeof s.o.includeLabel === "undefined" || s.o.includeLabel === true)
+                        ? `<label for='atf-filtervalue'>${((typeof s.o.labelText !== "undefined" && typeof s.o.labelText === "string") ? s.o.labelText : "Search:")}</label> &nbsp;`
+                        : "") +
+                    `<input type='text' class='atf-filtervalue' id='${s.o.container}-atf-filtervalue' placeholder='${((typeof s.o.searchText === "undefined" || s.o.searchText === "") ? "Enter a value to search for" : s.o.searchText)}'>`;
+
                 if (typeof s.o.columnSelect === "undefined" || s.o.columnSelect === true) {
-                    _('#' + s.o.container).innerHTML += "&nbsp; by column &nbsp; <select class='atf-filterselect' id='" + s.o.container + "-atf-filterselect'></select> &nbsp;";
+                    _(`#${s.o.container}`).innerHTML += `&nbsp; by column &nbsp; <select class='atf-filterselect' id='${s.o.container}-atf-filterselect'></select> &nbsp;`;
                 }
                 else {
-                    _('#' + s.o.container).innerHTML += "<select id='" + s.o.container + "-atf-filterselect' class='hider'></select> &nbsp;";
+                    _(`#${s.o.container}`).innerHTML += `<select id='${s.o.container}-atf-filterselect' class='hider'></select> &nbsp;`;
                 }
 
                 if (s.o.submitBy === 'button') {
-                    _('#' + s.o.container).innerHTML += "<button class='atf-filtersubmit' id='" + s.o.container + "-atf-filtersubmit'>Submit</button>";
+                    _(`#${s.o.container}`).innerHTML += `<button class='atf-filtersubmit' id='${s.o.container}-atf-filtersubmit'>Submit</button>`;
                 }
-                var ths = __('#' + s.o.table + ' > thead > tr > th');
-                var seloptions = "<option value='All' selected='selected'>All</option>";
-                for (i = 0; i < ths.length; i++) {
-                    var thval = (ths[i].querySelectorAll('*').length > 0 ? ths[i].childNodes[0].valueOf().textContent : ths[i].innerText.trim());
+
+                const ths = __(`#${s.o.table} > thead > tr > th`);
+                let seloptions = "<option value='All' selected='selected'>All</option>";
+                for (let i = 0; i < ths.length; i++) {
+                    const thval = (ths[i].querySelectorAll('*').length > 0 ? ths[i].childNodes[0].valueOf().textContent : ths[i].innerText.trim());
                     if (thval !== '') {
-                        seloptions += "<option value='" + thval + "'>" + thval + "</option>";
+                        seloptions += `<option value='${thval}'>${thval}</option>`;
                     }
                 }
-                _('#' + s.o.container + '-atf-filterselect').innerHTML = seloptions;
-                _('#' + s.o.container).style.display = (typeof s.o.display !== "undefined" && s.o.display !== "") ? s.o.display : 'block';
+
+                _(`#${s.o.container}-atf-filterselect`).innerHTML = seloptions;
+                _(`#${s.o.container}`).style.display = (typeof s.o.display !== "undefined" && s.o.display !== "") ? s.o.display : 'block';
 
                 if (s.o.submitBy === 'button') {
-                    _('#' + s.o.container + '-atf-filtersubmit').addEventListener('click', function () { filter('container'); }, false);
+                    _(`#${s.o.container}-atf-filtersubmit`).addEventListener('click', () => { filter('container'); }, false);
                 }
 
-                _('#' + s.o.container + '-atf-filtervalue').addEventListener('keyup', function (e) {
+                _(`#${s.o.container}-atf-filtervalue`).addEventListener('keyup', (e) => {
                     if (e.which === 27) {
-                        _('#' + s.o.container + '-atf-filtervalue').value = '';
+                        _(`#${s.o.container}-atf-filtervalue`).value = '';
                         filter('container');
                     }
                     if (e.which === 13 && (s.o.submitBy === 'button' || !s.o.submitBy)) {
                         filter('container');
                     }
-                    if (e.which === 8 && _('#' + s.o.container + '-atf-filtervalue').value === '') {
-                        var trs = __('#' + s.o.container + '-atf-tbody > tr');
+                    if (e.which === 8 && _(`#${s.o.container}-atf-filtervalue`).value === '') {
+                        const trs = __(`#${s.o.container}-atf-tbody > tr`);
                         if (typeof s.o.paging === "undefined") {
-                            for (i = 0; i < trs.length; i++) {
+                            for (let i = 0; i < trs.length; i++) {
                                 trs[i].classList.remove('hider');
                             }
                         }
                         else {
-                            var curopttxt = (__('#' + s.o.container + '-atf-paging-select').length > 0) ? _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text : 'ALL';
+                            const curopttxt = (__(`#${s.o.container}-atf-paging-select`).length > 0)
+                                ? _(`#${s.o.container}-atf-paging-select`).options[_(`#${s.o.container}-atf-paging-select`).selectedIndex].text
+                                : 'ALL';
+
                             if (curopttxt !== 'ALL') {
-                                var curval = +curopttxt;
-                                var curselopt = __('.atf-page-number-selected');
-                                var pageval = +curselopt[0].innerHTML;
-                                var baseval = (pageval - 1) * curval;
+                                const curval = +curopttxt;
+                                const curselopt = __('.atf-page-number-selected');
+                                const pageval = +curselopt[0].innerHTML;
+                                const baseval = (pageval - 1) * curval;
+
                                 if (typeof s.o.isToggleableTable !== "undefined") {
                                     if (s.o.isToggleableTable === true) {
-                                        for (i = 0; i < curval * 2; i++) {
+                                        for (let i = 0; i < curval * 2; i++) {
                                             if (typeof trs[i] !== "undefined") {
                                                 trs[i].classList.remove('hider');
                                             }
                                         }
-                                        for (i = trs.length - 1; i >= curval * 2; i--) {
+                                        for (let i = trs.length - 1; i >= curval * 2; i--) {
                                             if (typeof trs[i] !== "undefined") {
                                                 trs[i].classList.add('hider');
                                             }
                                         }
                                     }
                                     else {
-                                        for (i = trs.length - 1; i >= 0; i--) {
+                                        for (let i = trs.length - 1; i >= 0; i--) {
                                             if (typeof trs[i] !== "undefined") {
                                                 trs[i].classList.add('hider');
                                             }
                                         }
-                                        for (i = baseval; i < baseval + curval; i++) {
+                                        for (let i = baseval; i < baseval + curval; i++) {
                                             if (i !== trs.length) {
                                                 if (typeof trs[i] !== "undefined") {
                                                     trs[i].classList.remove('hider');
@@ -433,10 +457,10 @@ function atf() {
                                     }
                                 }
                                 else {
-                                    for (i = trs.length - 1; i >= 0; i--) {
+                                    for (let i = trs.length - 1; i >= 0; i--) {
                                         trs[i].classList.add('hider');
                                     }
-                                    for (i = baseval; i < baseval + curval; i++) {
+                                    for (let i = baseval; i < baseval + curval; i++) {
                                         if (i !== trs.length) {
                                             trs[i].classList.remove('hider');
                                         }
@@ -444,14 +468,14 @@ function atf() {
                                 }
                             }
                             else {
-                                for (i = trs.length - 1; i >= 0; i--) {
+                                for (let i = trs.length - 1; i >= 0; i--) {
                                     trs[i].classList.remove('hider');
                                 }
                             }
                         }
-
                     }
-                    if (s.o.submitBy === 'typing' && _('#' + s.o.container + '-atf-filtervalue').value !== '') {
+
+                    if (s.o.submitBy === 'typing' && _(`#${s.o.container}-atf-filtervalue`).value !== '') {
                         filter('container');
                     }
                 }, false);
@@ -461,11 +485,12 @@ function atf() {
         //paging
         if (typeof s.o.paging !== "undefined") {
             if (s.o.paging === true) {
-                (function (s) {
-                    var pagingEl = document.createElement("div");
-                    pagingEl.id = s.o.container + '-atf-paging-container';
+                ((s) => {
+                    const pagingEl = document.createElement("div");
+                    pagingEl.id = `${s.o.container}-atf-paging-container`;
                     pagingEl.setAttribute('class', 'atf-paging-container');
-                    _('#' + s.o.container).insertAdjacentElement('afterend', pagingEl);
+                    _(`#${s.o.container}`).insertAdjacentElement('afterend', pagingEl);
+
                     if (typeof s.o.pagingViews !== "undefined") {
                         if (s.o.pagingViews.length < 1) {
                             console.error("Error: paging is set to true, but the pagingViews array was empty.  Please give an array of number values that correspond to the number of items to show when selected (and/or an optional 'ALL' view).");
@@ -473,31 +498,34 @@ function atf() {
                         }
                         else {
                             //add in the paging label
-                            var pagingLabel = document.createElement('label');
+                            const pagingLabel = document.createElement('label');
                             pagingLabel.innerHTML = 'Show Records: &nbsp;&nbsp;&nbsp;';
-                            pagingLabel.id = s.o.container + '-atf-paging-label';
+                            pagingLabel.id = `${s.o.container}-atf-paging-label`;
                             pagingLabel.setAttribute('for', 'atf-paging-select');
-                            _('#' + s.o.container + '-atf-paging-container').insertAdjacentElement('beforeend', pagingLabel);
+                            _(`#${s.o.container}-atf-paging-container`).insertAdjacentElement('beforeend', pagingLabel);
+
                             //add in the paging select
-                            var pagingSelect = document.createElement('select');
-                            pagingSelect.id = s.o.container + '-atf-paging-select';
+                            const pagingSelect = document.createElement('select');
+                            pagingSelect.id = `${s.o.container}-atf-paging-select`;
                             pagingSelect.setAttribute('class', 'atf-paging-select');
-                            _('#' + s.o.container + '-atf-paging-label').insertAdjacentElement('afterend', pagingSelect);
+                            _(`#${s.o.container}-atf-paging-label`).insertAdjacentElement('afterend', pagingSelect);
+
                             //insert the options into the paging select from the list of views
-                            for (var _po = 0; _po < s.o.pagingViews.length; _po++) {
-                                var pagingOption = document.createElement('option');
+                            for (let _po = 0; _po < s.o.pagingViews.length; _po++) {
+                                const pagingOption = document.createElement('option');
                                 pagingOption.innerHTML = s.o.pagingViews[_po];
                                 pagingOption.value = s.o.pagingViews[_po];
-                                _('#' + s.o.container + '-atf-paging-select').insertAdjacentElement('beforeend', pagingOption);
+                                _(`#${s.o.container}-atf-paging-select`).insertAdjacentElement('beforeend', pagingOption);
                             }
+
                             //set the select to be the s.o.defaultView, if defined and 
                             if (typeof s.o.defaultView !== 'undefined') {
                                 if (typeof s.o.defaultView === 'string' && s.o.defaultView !== 'ALL') {
                                     s.o.defaultView = +s.o.defaultView;
                                 }
-                                var __opt;
+                                let __opt;
                                 if (s.o.defaultView === 'ALL') {
-                                    __opt = _('#' + s.o.container + '-atf-paging-select option[value="ALL"]');
+                                    __opt = _(`#${s.o.container}-atf-paging-select option[value="ALL"]`);
                                     if (__opt) {
                                         __opt.setAttribute('selected', 'selected');
                                     }
@@ -506,26 +534,28 @@ function atf() {
                                     if (s.o.pagingViews.indexOf(s.o.defaultView) < 0) {
                                         s.o.defaultView = s.o.pagingViews[0];
                                     }
-                                    __opt = _('#' + s.o.container + '-atf-paging-select option[value="' + s.o.defaultView + '"]');
+                                    __opt = _(`#${s.o.container}-atf-paging-select option[value="${s.o.defaultView}"]`);
                                     if (__opt) {
                                         __opt.setAttribute('selected', 'selected');
                                     }
                                 }
-
                             }
-                            var curval = _('#' + s.o.container + '-atf-paging-select').options[_('#' + s.o.container + '-atf-paging-select').selectedIndex].text;
-                            var recordsPerPage = +curval;
-                            var trs = __('#' + s.o.container + '-atf-tbody > tr');
+
+                            const curval = _(`#${s.o.container}-atf-paging-select`).options[_(`#${s.o.container}-atf-paging-select`).selectedIndex].text;
+                            let recordsPerPage = +curval;
+                            let trs = __(`#${s.o.container}-atf-tbody > tr`);
+
                             trloop2:
-                            for (var _tr = 0; _tr < trs.length; _tr++) {
+                            for (let _tr = 0; _tr < trs.length; _tr++) {
                                 if (typeof s.o.ignoreRows !== "undefined" && typeof s.o.ignoreRows === "object") {
-                                    var trclasses = trs[_tr].classList;
-                                    for (var _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
+                                    const trclasses = trs[_tr].classList;
+                                    for (let _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
                                         if (trclasses.contains(s.o.ignoreRows[_ic])) {
                                             continue trloop2;
                                         }
                                     }
                                 }
+
                                 if (curval === 'ALL') {
                                     break;
                                 }
@@ -552,20 +582,23 @@ function atf() {
                             }
 
                             //Paging buttons
-                            var selector = '#' + s.o.container + '-atf-tbody > tr';
+                            let selector = `#${s.o.container}-atf-tbody > tr`;
                             if (typeof s.o.ignoreRowsSelector === "string") {
-                                selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                selector += `:not(${s.o.ignoreRowsSelector})`;
                             }
                             trs = __(selector);
-                            var totalRows = trs.length;
-                            var totalPages = Math.ceil(totalRows / recordsPerPage);
-                            var pagingNumberContainer = document.createElement('div');
+
+                            const totalRows = trs.length;
+                            const totalPages = Math.ceil(totalRows / recordsPerPage);
+
+                            const pagingNumberContainer = document.createElement('div');
                             pagingNumberContainer.style.display = 'inline-block';
                             pagingNumberContainer.classList.add('atf-paging-number-container');
-                            pagingNumberContainer.id = s.o.container + '-atf-paging-number-container';
+                            pagingNumberContainer.id = `${s.o.container}-atf-paging-number-container`;
                             pagingEl.insertAdjacentElement('beforeend', pagingNumberContainer);
-                            for (var _i = 0; _i < totalPages; _i++) {
-                                var span = document.createElement('span');
+
+                            for (let _i = 0; _i < totalPages; _i++) {
+                                const span = document.createElement('span');
                                 span.classList.add('atf-page-number');
                                 if (_i === 0) {
                                     span.classList.add('atf-page-number-selected');
@@ -573,22 +606,26 @@ function atf() {
                                 span.innerHTML = (_i + 1).toString();
                                 pagingNumberContainer.insertAdjacentElement('beforeend', span);
                             }
-                            var pageButtons = __('.atf-page-number');
-                            for (_i = 0; _i < pageButtons.length; _i++) {
+
+                            let pageButtons = __('.atf-page-number');
+                            for (let _i = 0; _i < pageButtons.length; _i++) {
                                 pageButtons[_i].addEventListener('click', function () {
-                                    for (var _x = 0; _x < pageButtons.length; _x++) {
+                                    for (let _x = 0; _x < pageButtons.length; _x++) {
                                         pageButtons[_x].classList.remove('atf-page-number-selected');
                                     }
                                     this.classList.add('atf-page-number-selected');
-                                    var num = +this.innerHTML;
-                                    var beginning = (num - 1) * recordsPerPage;
-                                    var ending = (num * recordsPerPage - 1);
-                                    var selector = '#' + s.o.container + '-atf-tbody > tr';
+
+                                    const num = +this.innerHTML;
+                                    const beginning = (num - 1) * recordsPerPage;
+                                    const ending = (num * recordsPerPage - 1);
+
+                                    let selector = `#${s.o.container}-atf-tbody > tr`;
                                     if (typeof s.o.ignoreRowsSelector === "string") {
-                                        selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                        selector += `:not(${s.o.ignoreRowsSelector})`;
                                     }
                                     trs = __(selector);
-                                    for (var _y = trs.length - 1; _y >= 0; _y--) {
+
+                                    for (let _y = trs.length - 1; _y >= 0; _y--) {
                                         if (_y > beginning - 1 && _y < ending + 1) {
                                             trs[_y].classList.remove('hider');
                                         }
@@ -599,24 +636,26 @@ function atf() {
                                 });
                             }
 
-                            _('#' + s.o.container + '-atf-paging-select').addEventListener('change', function () {
-                                var curval = this.options[this.selectedIndex].text;
-                                var recordsPerPage = parseInt(curval, 10);
-                                var trs = __('#' + s.o.container + '-atf-tbody > tr');
+                            _(`#${s.o.container}-atf-paging-select`).addEventListener('change', function () {
+                                const curval = this.options[this.selectedIndex].text;
+                                const recordsPerPage = parseInt(curval, 10);
+                                let trs = __(`#${s.o.container}-atf-tbody > tr`);
 
-                                for (var _tr = 0; _tr < trs.length; _tr++) {
+                                for (let _tr = 0; _tr < trs.length; _tr++) {
                                     trs[_tr].classList.remove('hider');
                                 }
+
                                 trloop2:
-                                for (_tr = 0; _tr < trs.length; _tr++) {
+                                for (let _tr = 0; _tr < trs.length; _tr++) {
                                     if (typeof s.o.ignoreRows !== "undefined" && typeof s.o.ignoreRows === "object") {
-                                        var trclasses = trs[_tr].classList;
-                                        for (var _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
+                                        const trclasses = trs[_tr].classList;
+                                        for (let _ic = 0; _ic < s.o.ignoreRows.length; _ic++) {
                                             if (trclasses.contains(s.o.ignoreRows[_ic])) {
                                                 continue trloop2;
                                             }
                                         }
                                     }
+
                                     if (curval === 'ALL') {
                                         break;
                                     }
@@ -641,23 +680,28 @@ function atf() {
                                         }
                                     }
                                 }
+
                                 //paging buttons
-                                var el = _('#' + s.o.container + '-atf-paging-number-container');
+                                const el = _(`#${s.o.container}-atf-paging-number-container`);
                                 el.parentNode.removeChild(el);
-                                var selector = '#' + s.o.container + '-atf-tbody > tr';
+
+                                let selector = `#${s.o.container}-atf-tbody > tr`;
                                 if (typeof s.o.ignoreRowsSelector === "string") {
-                                    selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                    selector += `:not(${s.o.ignoreRowsSelector})`;
                                 }
                                 trs = __(selector);
-                                var totalRows = trs.length;
-                                var totalPages = Math.ceil(totalRows / recordsPerPage);
-                                var pagingNumberContainer = document.createElement('div');
+
+                                const totalRows = trs.length;
+                                const totalPages = Math.ceil(totalRows / recordsPerPage);
+
+                                const pagingNumberContainer = document.createElement('div');
                                 pagingNumberContainer.style.display = 'inline-block';
                                 pagingNumberContainer.classList.add('atf-paging-number-container');
-                                pagingNumberContainer.id = s.o.container + '-atf-paging-number-container';
+                                pagingNumberContainer.id = `${s.o.container}-atf-paging-number-container`;
                                 pagingEl.insertAdjacentElement('beforeend', pagingNumberContainer);
-                                for (var _i = 0; _i < totalPages; _i++) {
-                                    var span = document.createElement('span');
+
+                                for (let _i = 0; _i < totalPages; _i++) {
+                                    const span = document.createElement('span');
                                     span.classList.add('atf-page-number');
                                     if (_i === 0) {
                                         span.classList.add('atf-page-number-selected');
@@ -665,22 +709,26 @@ function atf() {
                                     span.innerHTML = (_i + 1).toString();
                                     pagingNumberContainer.insertAdjacentElement('beforeend', span);
                                 }
-                                var pageButtons = __('.atf-page-number');
-                                for (_i = 0; _i < pageButtons.length; _i++) {
+
+                                const pageButtons = __('.atf-page-number');
+                                for (let _i = 0; _i < pageButtons.length; _i++) {
                                     pageButtons[_i].addEventListener('click', function () {
-                                        for (var _x = 0; _x < pageButtons.length; _x++) {
+                                        for (let _x = 0; _x < pageButtons.length; _x++) {
                                             pageButtons[_x].classList.remove('atf-page-number-selected');
                                         }
                                         this.classList.add('atf-page-number-selected');
-                                        var num = parseInt(this.innerHTML, 10);
-                                        var beginning = (num - 1) * recordsPerPage;
-                                        var ending = (num * recordsPerPage - 1);
-                                        var selector = '#' + s.o.container + '-atf-tbody > tr';
+
+                                        const num = parseInt(this.innerHTML, 10);
+                                        const beginning = (num - 1) * recordsPerPage;
+                                        const ending = (num * recordsPerPage - 1);
+
+                                        let selector = `#${s.o.container}-atf-tbody > tr`;
                                         if (typeof s.o.ignoreRowsSelector === "string") {
-                                            selector += ':not(' + s.o.ignoreRowsSelector + ')';
+                                            selector += `:not(${s.o.ignoreRowsSelector})`;
                                         }
                                         trs = __(selector);
-                                        for (var _y = trs.length - 1; _y >= 0; _y--) {
+
+                                        for (let _y = trs.length - 1; _y >= 0; _y--) {
                                             if (_y > beginning - 1 && _y < ending + 1) {
                                                 trs[_y].classList.remove('hider');
                                             }
