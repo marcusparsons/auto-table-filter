@@ -310,9 +310,7 @@ function atf() {
 
         _(`#${s.o.table} > tbody`).setAttribute("id", `${s.o.container}-atf-tbody`);
 
-        //GOTO HERE
-        //THIS HAS TO BE REDONE (TEMP FOR TEMP SORTING)
-        //NEEDS TO BE ADDED IN AS A FEATURE (USE BASICALLY EXISTING CODE YOU MADE ON THE JOBS INDEX PAGE)
+        //GOTO HERE (TEMP INDEX SORTING)
         (() => {
             const trs = __(`#${s.o.table} > tbody > tr`);
             for (let i = 0; i < trs.length; i++) {
